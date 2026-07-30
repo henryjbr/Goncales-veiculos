@@ -616,10 +616,11 @@ button {
   border-top: 1px solid var(--line);
 }
 
-.price-label {
+.price-row span {
+  min-width: 178px;
+  flex: 1;
   color: var(--steel);
   font-weight: 900;
-  text-transform: uppercase;
 }
 
 .price-row strong {
@@ -627,12 +628,6 @@ button {
   color: var(--red);
   font-size: clamp(1.35rem, 2vw, 1.85rem);
   line-height: 1;
-}
-
-.price-row strong small {
-  margin-right: 6px;
-  color: var(--steel);
-  font-size: 0.68em;
 }
 
 .deal-button,
@@ -1111,10 +1106,6 @@ body.toast-visible::after {
   font-weight: 800;
 }
 
-.mobile-contact-bar {
-  display: none;
-}
-
 [hidden] {
   display: none !important;
 }
@@ -1268,249 +1259,5 @@ body.toast-visible::after {
 
   .vehicle-media {
     aspect-ratio: 4 / 3;
-  }
-
-  body[data-page="catalog"] {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom));
-    background: #f7f7f8;
-  }
-
-  body[data-page="catalog"] .topbar {
-    position: static;
-    align-items: center;
-    min-height: 72px;
-    padding: 8px 14px 0;
-    border-bottom: 0;
-    background: #f7f7f8;
-    backdrop-filter: none;
-  }
-
-  body[data-page="catalog"] .brand {
-    justify-content: center;
-    width: 100%;
-  }
-
-  body[data-page="catalog"] .brand-logo {
-    width: 118px;
-    height: 64px;
-  }
-
-  body[data-page="catalog"] .brand-logo img {
-    transform: none;
-  }
-
-  body[data-page="catalog"] .brand > span:last-child {
-    display: none;
-  }
-
-  body[data-page="catalog"] .catalog-shell {
-    display: block;
-    min-height: auto;
-  }
-
-  body[data-page="catalog"] .catalog-panel,
-  body[data-page="catalog"] .catalog-toolbar {
-    display: none;
-  }
-
-  body[data-page="catalog"] .catalog-view {
-    min-width: 0;
-    padding: 26px 8px 18px;
-  }
-
-  body[data-page="catalog"] .catalog-heading {
-    display: block;
-    margin: 0 0 72px;
-    text-align: center;
-  }
-
-  body[data-page="catalog"] .catalog-heading p {
-    display: none;
-  }
-
-  body[data-page="catalog"] .catalog-heading h1 {
-    color: #2d2e33;
-    font-size: clamp(2.35rem, 10.6vw, 3.25rem);
-    line-height: 1.02;
-    font-weight: 900;
-    letter-spacing: 0;
-  }
-
-  body[data-page="catalog"] .vehicle-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    justify-content: stretch;
-    align-items: start;
-    gap: 22px 6px;
-    min-width: 0;
-    overflow-x: hidden;
-  }
-
-  body[data-page="catalog"] .vehicle-card {
-    min-width: 0;
-    min-height: 0;
-    width: 100%;
-    border: 1px solid #eeeeef;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(24, 25, 29, 0.06);
-  }
-
-  body[data-page="catalog"] .vehicle-media {
-    aspect-ratio: 1 / 1;
-    background: #e2e3e5;
-  }
-
-  body[data-page="catalog"] .status-badge,
-  body[data-page="catalog"] .spec-list,
-  body[data-page="catalog"] .highlight-row,
-  body[data-page="catalog"] .card-actions .deal-button {
-    display: none;
-  }
-
-  body[data-page="catalog"] .vehicle-body {
-    grid-template-rows: auto auto auto;
-    gap: 10px;
-    min-width: 0;
-    padding: 13px 8px 10px;
-  }
-
-  body[data-page="catalog"] .vehicle-title {
-    gap: 9px;
-    min-width: 0;
-  }
-
-  body[data-page="catalog"] .vehicle-title h2 {
-    min-height: 2.3em;
-    font-size: clamp(1rem, 4.3vw, 1.27rem);
-    line-height: 1.12;
-    letter-spacing: 0.04em;
-    overflow-wrap: anywhere;
-  }
-
-  body[data-page="catalog"] .vehicle-title p {
-    -webkit-line-clamp: 3;
-    min-height: 4.35em;
-    color: #2d2e33;
-    font-size: clamp(0.74rem, 3.45vw, 0.96rem);
-    line-height: 1.45;
-    letter-spacing: 0.08em;
-    overflow-wrap: anywhere;
-  }
-
-  body[data-page="catalog"] .price-row {
-    justify-content: center;
-    gap: 0;
-    margin: 0;
-    padding: 16px 2px 0;
-    text-align: center;
-  }
-
-  body[data-page="catalog"] .price-label {
-    display: none;
-  }
-
-  body[data-page="catalog"] .price-row strong {
-    font-size: clamp(0.98rem, 4.35vw, 1.34rem);
-    line-height: 1.05;
-    white-space: nowrap;
-  }
-
-  body[data-page="catalog"] .price-row strong small {
-    margin-right: 4px;
-    color: #70727a;
-    font-size: 0.78em;
-  }
-
-  body[data-page="catalog"] .card-actions {
-    display: block;
-  }
-
-  body[data-page="catalog"] .details-button {
-    width: 100%;
-    min-width: 0;
-    height: 48px;
-    margin-top: 6px;
-    border-color: var(--red);
-    border-radius: 5px;
-    background: var(--red);
-    color: var(--paper);
-    font-size: clamp(0.85rem, 3.7vw, 1rem);
-  }
-
-  body[data-page="catalog"] .details-button:hover {
-    background: var(--red-dark);
-  }
-
-  body[data-page="catalog"] .details-dialog {
-    width: calc(100vw - 16px);
-    max-height: calc(100vh - 18px);
-  }
-
-  body[data-page="catalog"] .details-copy h2 {
-    font-size: 2rem;
-  }
-
-  body[data-page="catalog"] .mobile-contact-bar {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 40;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    min-height: calc(70px + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
-    border-top: 1px solid #d8d8dc;
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 -12px 24px rgba(23, 24, 28, 0.1);
-    backdrop-filter: blur(16px);
-  }
-
-  body[data-page="catalog"] .contact-action {
-    display: grid;
-    place-items: center;
-    min-height: 70px;
-    border-right: 1px solid #d8d8dc;
-    color: #24262d;
-  }
-
-  body[data-page="catalog"] .contact-action:last-child {
-    border-right: 0;
-  }
-
-  body[data-page="catalog"] .contact-action svg {
-    width: 38px;
-    height: 38px;
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 1.85;
-  }
-
-  body[data-page="catalog"] .contact-action.instagram {
-    color: #ff493f;
-  }
-
-  body[data-page="catalog"] .contact-action.phone svg {
-    width: 40px;
-    height: 40px;
-    padding: 9px;
-    border-radius: 7px;
-    background: #24262d;
-    color: #ffffff;
-  }
-
-  body[data-page="catalog"] .contact-action.whatsapp {
-    color: #16a63a;
-  }
-
-  body[data-page="catalog"] .contact-action.whatsapp svg {
-    width: 44px;
-    height: 44px;
-  }
-
-  body[data-page="catalog"] .contact-action.is-disabled {
-    opacity: 0.36;
-    pointer-events: none;
   }
 }
