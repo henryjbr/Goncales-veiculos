@@ -132,6 +132,10 @@ function formatCurrencyFromCents(value) {
   }).format((Number(value) || 0) / 100);
 }
 
+function formatPriceAmount(value) {
+  return formatCurrencyFromCents(value).replace(/^R\$\s?/, "");
+}
+
 function formatMileage(value) {
   return new Intl.NumberFormat("pt-BR").format(Number(value) || 0);
 }
@@ -180,6 +184,31 @@ function buildWhatsAppUrl(vehicle) {
   const base = phone ? `https://wa.me/${phone}` : "https://api.whatsapp.com/send";
 
   return `${base}?text=${encodeURIComponent(message)}`;
+}
+
+function updateMobileContactBar() {
+  const instagram = document.querySelector("#mobileInstagramLink");
+  const phoneLink = document.querySelector("#mobilePhoneLink");
+  const whatsapp = document.querySelector("#mobileWhatsappLink");
+  const phone = onlyDigits(settingsCache.whatsapp);
+  const message = "Ola, vim pelo catalogo da Goncales Veiculos e gostaria de falar com a loja.";
+
+  if (instagram && settingsCache.instagram_url) {
+    instagram.href = settingsCache.instagram_url;
+    instagram.target = "_blank";
+    instagram.rel = "noopener";
+    instagram.classList.remove("is-disabled");
+  }
+
+  if (phoneLink && phone) {
+    phoneLink.href = `tel:+${phone}`;
+    phoneLink.classList.remove("is-disabled");
+  }
+
+  if (whatsapp) {
+    const base = phone ? `https://wa.me/${phone}` : "https://api.whatsapp.com/send";
+    whatsapp.href = `${base}?text=${encodeURIComponent(message)}`;
+  }
 }
 
 function showToast(message) {
@@ -370,13 +399,11 @@ function vehicleCard(vehicle) {
         </dl>
         ${renderHighlights(vehicle)}
         <div class="price-row">
-          <span>
-            Valor
-            <strong>${formatCurrencyFromCents(vehicle.price_cents)}</strong>
-          </span>
+          <span class="price-label">Valor</span>
+          <strong><small>R$</small>${formatPriceAmount(vehicle.price_cents)}</strong>
         </div>
         <div class="card-actions">
-          <button class="details-button" type="button" data-details-id="${escapeHtml(vehicle.id)}">Ver detalhes</button>
+          <button class="details-button" type="button" data-details-id="${escapeHtml(vehicle.id)}">Ver mais</button>
           <a class="deal-button" href="${buildWhatsAppUrl(vehicle)}" target="_blank" rel="noopener">Negociar</a>
         </div>
       </div>
@@ -534,6 +561,8 @@ async function initCatalog() {
     usingDemoData = true;
     showToast("Usando estoque de demonstração até configurar o Supabase");
   }
+
+  updateMobileContactBar();
 
   fillSelect(fuel, uniqueOptions(vehiclesCache, "fuel", FUEL_LABELS));
   fillSelect(transmission, uniqueOptions(vehiclesCache, "transmission", TRANSMISSION_LABELS));
