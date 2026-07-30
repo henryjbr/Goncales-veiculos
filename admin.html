@@ -29,19 +29,40 @@
         <h1>&Aacute;rea do dono</h1>
       </div>
 
+      <div id="adminStatus" class="admin-status" hidden>
+        <div>
+          <span>Sess&atilde;o ativa</span>
+          <strong id="adminSessionEmail">Dono conectado</strong>
+        </div>
+        <button id="logoutButton" class="quiet-button" type="button">Sair</button>
+      </div>
+
+      <div id="setupNotice" class="setup-notice" hidden>
+        <strong>Supabase ainda n&atilde;o configurado</strong>
+        <p>Preencha a URL e a anon key em <code>js/supabase-config.js</code>, rode o SQL em <code>database/supabase-schema.sql</code> e crie o usu&aacute;rio do dono em Authentication.</p>
+        <a class="secondary-button" href="index.html">Ver cat&aacute;logo demo</a>
+      </div>
+
       <form id="loginForm" class="login-panel">
+        <div class="login-heading">
+          <span>Acesso restrito</span>
+          <strong>Entrar no painel</strong>
+        </div>
+
         <label class="field">
           <span>E-mail do dono</span>
-          <input id="adminEmail" type="email" autocomplete="email" placeholder="dono@email.com">
+          <input id="adminEmail" type="email" autocomplete="email" placeholder="dono@email.com" value="henryjbrosal@gmail.com">
         </label>
 
         <label class="field">
           <span>Senha</span>
-          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Senha do Supabase">
+          <span class="password-control">
+            <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Senha">
+            <button id="togglePasswordButton" class="password-toggle" type="button" aria-label="Mostrar senha">Ver</button>
+          </span>
         </label>
 
         <button class="secondary-button" type="submit">Entrar</button>
-        <button id="logoutButton" class="quiet-button" type="button" hidden>Sair</button>
       </form>
 
       <form id="settingsForm" class="settings-line" hidden>
@@ -54,6 +75,11 @@
 
       <form id="vehicleForm" class="vehicle-form" hidden>
         <input id="vehicleId" type="hidden">
+
+        <div class="form-section-title">
+          <span>Dados comerciais</span>
+          <strong>Informa&ccedil;&otilde;es principais do an&uacute;ncio</strong>
+        </div>
 
         <div class="form-grid">
           <label class="field span-2">
@@ -131,7 +157,14 @@
             <span>Destaques</span>
             <input id="carHighlights" type="text" placeholder="Blindado, revisado, &uacute;nico dono">
           </label>
+        </div>
 
+        <div class="form-section-title">
+          <span>Ficha t&eacute;cnica</span>
+          <strong>Detalhes exibidos no bot&atilde;o Ver detalhes</strong>
+        </div>
+
+        <div class="form-grid">
           <label class="field">
             <span>Motor</span>
             <input id="carEngine" type="text" placeholder="2.0 turbo, 1.0 TSI">

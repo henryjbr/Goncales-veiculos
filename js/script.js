@@ -18,9 +18,85 @@ const TRANSMISSION_LABELS = {
   cvt: "CVT",
   manual: "Manual"
 };
+const DEMO_SETTINGS = {
+  whatsapp: ""
+};
+const DEFAULT_OWNER_EMAIL = "henryjbrosal@gmail.com";
+const DEMO_VEHICLES = [
+  {
+    id: "demo-corolla-cross",
+    name: "Toyota Corolla Cross",
+    version: "2.0 VVT-IE Flex XR Direct Shift",
+    model_year: "2024/2025",
+    mileage_km: 9200,
+    price_cents: 13199900,
+    fuel: "flex",
+    transmission: "cvt",
+    color: "Prata",
+    status: "published",
+    cover_image_url: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=82",
+    highlights: ["Garantia", "SUV", "Baixa km"],
+    engine: "2.0 aspirado",
+    horsepower: 177,
+    torque: "21,4 kgfm",
+    drivetrain: "Dianteira",
+    doors: 4,
+    seats: 5,
+    plate_final: "7",
+    sort_order: 10,
+    description: "SUV familiar com excelente consumo, pacote completo e interior conservado."
+  },
+  {
+    id: "demo-jeep-gladiator",
+    name: "Jeep Gladiator",
+    version: "3.6 V6 Gasolina Rubicon 4P 4x4 AT8",
+    model_year: "2023/2024",
+    mileage_km: 18000,
+    price_cents: 35499900,
+    fuel: "gasolina",
+    transmission: "automatico",
+    color: "Branco",
+    status: "published",
+    cover_image_url: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=82",
+    highlights: ["4x4", "Rubicon", "Pronta entrega"],
+    engine: "3.6 V6",
+    horsepower: 284,
+    torque: "35,4 kgfm",
+    drivetrain: "4x4",
+    doors: 4,
+    seats: 5,
+    plate_final: "3",
+    sort_order: 9,
+    description: "Picape premium com pacote off-road, revisões em dia e excelente estado."
+  },
+  {
+    id: "demo-nivus",
+    name: "Volkswagen Nivus",
+    version: "1.0 200 TSI Total Flex Highline Automático",
+    model_year: "2022/2023",
+    mileage_km: 26500,
+    price_cents: 11890000,
+    fuel: "flex",
+    transmission: "automatico",
+    color: "Vermelho",
+    status: "published",
+    cover_image_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=82",
+    highlights: ["Highline", "Turbo", "Completo"],
+    engine: "1.0 TSI turbo",
+    horsepower: 128,
+    torque: "20,4 kgfm",
+    drivetrain: "Dianteira",
+    doors: 4,
+    seats: 5,
+    plate_final: "9",
+    sort_order: 8,
+    description: "Modelo com central multimídia, rodas de liga e pacote de segurança."
+  }
+];
 
 let vehiclesCache = [];
 let settingsCache = { whatsapp: "" };
+let usingDemoData = false;
 
 function createClient() {
   const config = window.GONCALES_SUPABASE || {};
@@ -31,8 +107,9 @@ function createClient() {
 
   return window.supabase.createClient(config.url, config.anonKey, {
     auth: {
-      autoRefreshToken: false,
-      persistSession: false
+      autoRefreshToken: true,
+      persistSession: true,
+      storageKey: "goncales-admin-auth"
     }
   });
 }
@@ -114,7 +191,82 @@ function showToast(message) {
   }, 2600);
 }
 
+function friendlyAuthMessage(error) {
+  const message = String(error?.message || "Erro ao autenticar");
+
+  if (message.toLowerCase().includes("invalid login credentials")) {
+    return "E-mail ou senha incorretos.";
+  }
+
+  if (message.toLowerCase().includes("email not confirmed")) {
+    return "Confirme o e-mail do usuário no Supabase ou desative a confirmação de e-mail.";
+  }
+
+  return message;
+}
+
+function friendlyDatabaseMessage(error) {
+  const message = String(error?.message || "Erro no banco de dados");
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("row-level security") || normalized.includes("permission denied")) {
+    return "Seu usuario ainda nao esta liberado como dono. Rode o SQL atualizado em database/supabase-schema.sql e entre novamente.";
+  }
+
+  if (normalized.includes("could not find the function") && normalized.includes("claim_owner_admin")) {
+    return "Rode o SQL atualizado em database/supabase-schema.sql para liberar o painel do dono.";
+  }
+
+  if (normalized.includes("not allowed to manage this store")) {
+    return "Este e-mail nao esta autorizado a gerenciar a loja.";
+  }
+
+  return message;
+}
+
+async function ensureAdminAccess(client) {
+  const config = window.GONCALES_SUPABASE || {};
+  const ownerEmail = String(config.ownerEmail || DEFAULT_OWNER_EMAIL).toLowerCase();
+  const { data: userData, error: userError } = await client.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  const currentEmail = String(userData.user?.email || "").toLowerCase();
+
+  if (currentEmail !== ownerEmail) {
+    throw new Error("This user is not allowed to manage this store");
+  }
+
+  const { error } = await client.rpc("claim_owner_admin");
+
+  if (error) {
+    const message = String(error.message || "").toLowerCase();
+
+    if (message.includes("could not find the function")) {
+      const { data: adminRow } = await client
+        .from("app_admins")
+        .select("user_id")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+
+      if (adminRow) {
+        return;
+      }
+    }
+
+    throw error;
+  }
+}
+
 async function fetchSettings() {
+  if (!supabaseClient) {
+    settingsCache = DEMO_SETTINGS;
+    usingDemoData = true;
+    return settingsCache;
+  }
+
   const client = requireSupabase();
   const { data, error } = await client
     .from("store_settings")
@@ -131,6 +283,12 @@ async function fetchSettings() {
 }
 
 async function fetchVehicles({ admin = false } = {}) {
+  if (!supabaseClient) {
+    vehiclesCache = admin ? [] : [...DEMO_VEHICLES];
+    usingDemoData = true;
+    return vehiclesCache;
+  }
+
   const client = requireSupabase();
   let query = client
     .from("vehicles")
@@ -149,6 +307,7 @@ async function fetchVehicles({ admin = false } = {}) {
   }
 
   vehiclesCache = data || [];
+  usingDemoData = false;
   return vehiclesCache;
 }
 
@@ -370,9 +529,10 @@ async function initCatalog() {
     await fetchSettings();
     await fetchVehicles();
   } catch (error) {
-    summary.textContent = "Erro ao carregar estoque";
-    showToast(error.message);
-    return;
+    settingsCache = DEMO_SETTINGS;
+    vehiclesCache = [...DEMO_VEHICLES];
+    usingDemoData = true;
+    showToast("Usando estoque de demonstração até configurar o Supabase");
   }
 
   fillSelect(fuel, uniqueOptions(vehiclesCache, "fuel", FUEL_LABELS));
@@ -417,7 +577,7 @@ async function initCatalog() {
     }
 
     total.textContent = `${vehiclesCache.length} ${vehiclesCache.length === 1 ? "carro" : "carros"}`;
-    summary.textContent = `${filtered.length} ${filtered.length === 1 ? "resultado" : "resultados"} no estoque`;
+    summary.textContent = `${filtered.length} ${filtered.length === 1 ? "resultado" : "resultados"} no estoque${usingDemoData ? " (demo)" : ""}`;
     grid.innerHTML = filtered.map(vehicleCard).join("");
     empty.hidden = filtered.length > 0;
   }
@@ -557,18 +717,50 @@ async function uploadVehicleImage(file) {
 }
 
 function setAdminEnabled(enabled) {
+  document.body.classList.toggle("admin-login-mode", !enabled);
+  document.body.classList.toggle("admin-active-mode", enabled);
+  document.querySelector("#loginForm").toggleAttribute("hidden", enabled);
+  document.querySelector("#adminStatus").toggleAttribute("hidden", !enabled);
   document.querySelector("#settingsForm").toggleAttribute("hidden", !enabled);
   document.querySelector("#vehicleForm").toggleAttribute("hidden", !enabled);
   document.querySelector(".inventory-panel").toggleAttribute("hidden", !enabled);
-  document.querySelector("#logoutButton").hidden = !enabled;
+}
+
+function setAdminEmail(email) {
+  const label = document.querySelector("#adminSessionEmail");
+
+  if (label) {
+    label.textContent = email || "Dono conectado";
+  }
+}
+
+function setSetupNoticeVisible(visible) {
+  const setupNotice = document.querySelector("#setupNotice");
+  const loginForm = document.querySelector("#loginForm");
+
+  if (setupNotice) {
+    setupNotice.hidden = !visible;
+  }
+
+  if (loginForm) {
+    loginForm.hidden = visible;
+  }
 }
 
 async function initAdmin() {
+  if (!supabaseClient) {
+    setAdminEnabled(false);
+    setSetupNoticeVisible(true);
+    return;
+  }
+
+  setSetupNoticeVisible(false);
   const client = requireSupabase();
   let vehicles = [];
   const form = document.querySelector("#vehicleForm");
   const settingsForm = document.querySelector("#settingsForm");
   const loginForm = document.querySelector("#loginForm");
+  const togglePasswordButton = document.querySelector("#togglePasswordButton");
   const logoutButton = document.querySelector("#logoutButton");
   const list = document.querySelector("#adminList");
   const empty = document.querySelector("#adminEmpty");
@@ -586,10 +778,19 @@ async function initAdmin() {
   }
 
   const { data: sessionData } = await client.auth.getSession();
-  setAdminEnabled(Boolean(sessionData.session));
+  setAdminEmail(sessionData.session?.user?.email);
+  setAdminEnabled(false);
 
   if (sessionData.session) {
-    await loadAdminData();
+    try {
+      await ensureAdminAccess(client);
+      setAdminEnabled(true);
+      await loadAdminData();
+    } catch (error) {
+      await client.auth.signOut();
+      setAdminEmail("");
+      showToast(friendlyDatabaseMessage(error));
+    }
   }
 
   loginForm.addEventListener("submit", async (event) => {
@@ -599,19 +800,38 @@ async function initAdmin() {
     const { error } = await client.auth.signInWithPassword({ email, password });
 
     if (error) {
-      showToast(error.message);
+      showToast(friendlyAuthMessage(error));
       return;
     }
 
-    setAdminEnabled(true);
-    await loadAdminData();
-    showToast("Login realizado");
+    try {
+      await ensureAdminAccess(client);
+      setAdminEnabled(true);
+      const { data: userData } = await client.auth.getUser();
+      setAdminEmail(userData.user?.email || email);
+      await loadAdminData();
+      showToast("Login realizado");
+    } catch (adminError) {
+      await client.auth.signOut();
+      setAdminEnabled(false);
+      showToast(friendlyDatabaseMessage(adminError));
+    }
   });
 
   logoutButton.addEventListener("click", async () => {
     await client.auth.signOut();
     setAdminEnabled(false);
+    setAdminEmail("");
     showToast("Sessão encerrada");
+  });
+
+  togglePasswordButton.addEventListener("click", () => {
+    const passwordInput = document.querySelector("#adminPassword");
+    const showingPassword = passwordInput.type === "text";
+
+    passwordInput.type = showingPassword ? "password" : "text";
+    togglePasswordButton.textContent = showingPassword ? "Ver" : "Ocultar";
+    togglePasswordButton.setAttribute("aria-label", showingPassword ? "Mostrar senha" : "Ocultar senha");
   });
 
   settingsForm.addEventListener("submit", async (event) => {
@@ -622,7 +842,7 @@ async function initAdmin() {
       .eq("id", true);
 
     if (error) {
-      showToast(error.message);
+      showToast(friendlyDatabaseMessage(error));
       return;
     }
 
@@ -656,7 +876,7 @@ async function initAdmin() {
       resetForm(form);
       showToast(currentId ? "Veículo atualizado" : "Veículo publicado");
     } catch (error) {
-      showToast(error.message);
+      showToast(friendlyDatabaseMessage(error));
     }
   });
 
@@ -685,7 +905,7 @@ async function initAdmin() {
       const { error } = await client.from("vehicles").delete().eq("id", id);
 
       if (error) {
-        showToast(error.message);
+        showToast(friendlyDatabaseMessage(error));
         return;
       }
 

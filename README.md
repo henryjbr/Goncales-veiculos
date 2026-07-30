@@ -16,6 +16,8 @@ Site estático com catálogo público de veículos e painel administrativo integ
 ## Supabase
 
 1. Rode `database/supabase-schema.sql` no SQL Editor do Supabase.
-2. Edite `js/supabase-config.js` com a URL e anon key do projeto.
+2. Edite `js/supabase-config.js` com a URL, anon key e `ownerEmail` do projeto.
 3. Crie o usuário do dono no Supabase Authentication.
-4. Substitua `DONO@EMAIL.COM` no SQL pelo e-mail real do dono antes de rodar o bootstrap.
+4. Depois de criar o usuário, rode novamente `database/supabase-schema.sql` ou entre pelo painel para executar a liberação segura do dono.
+
+Se aparecer `new row violates row-level security policy` ao salvar um carro, rode `database/fix-owner-admin.sql` no Supabase. O e-mail autorizado atual é `henryjbrosal@gmail.com`.
