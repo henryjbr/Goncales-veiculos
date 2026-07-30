@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gon&ccedil;ales Ve&iacute;culos | Cat&aacute;logo</title>
+  <meta name="description" content="Cat&aacute;logo de ve&iacute;culos da Gon&ccedil;ales Ve&iacute;culos.">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="catalog">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Gon&ccedil;ales Ve&iacute;culos">
+      <span class="brand-logo">
+        <img src="assets/logo-header.png" alt="Logo Gon&ccedil;ales Ve&iacute;culos">
+      </span>
+      <span>Gon&ccedil;ales Ve&iacute;culos</span>
+    </a>
+  </header>
+
+  <main class="catalog-shell">
+    <aside class="catalog-panel" aria-label="Filtros do cat&aacute;logo">
+      <div class="panel-mark">
+        <span>Estoque premium</span>
+        <strong id="catalogTotal">0 carros</strong>
+      </div>
+
+      <div class="filter-stack">
+        <label class="field">
+          <span>Buscar</span>
+          <input id="searchInput" type="search" placeholder="Modelo, vers&atilde;o, cor">
+        </label>
+
+        <label class="field">
+          <span>Combust&iacute;vel</span>
+          <select id="fuelFilter">
+            <option value="">Todos</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>C&acirc;mbio</span>
+          <select id="transmissionFilter">
+            <option value="">Todos</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Ordenar</span>
+          <select id="sortSelect">
+            <option value="featured">Destaques</option>
+            <option value="priceAsc">Menor valor</option>
+            <option value="priceDesc">Maior valor</option>
+            <option value="yearDesc">Mais novo</option>
+          </select>
+        </label>
+      </div>
+    </aside>
+
+    <section class="catalog-view" aria-label="Cat&aacute;logo de ve&iacute;culos">
+      <div class="catalog-heading">
+        <p>Novidades selecionadas</p>
+        <h1>Gon&ccedil;ales Ve&iacute;culos</h1>
+      </div>
+
+      <div class="catalog-toolbar">
+        <span id="resultSummary">Carregando estoque</span>
+        <button id="clearFilters" class="quiet-button" type="button">Limpar filtros</button>
+      </div>
+
+      <div id="catalogGrid" class="vehicle-grid"></div>
+
+      <div id="emptyState" class="empty-state" hidden>
+        <strong>Nenhum ve&iacute;culo encontrado</strong>
+        <span>Ajuste os filtros para ver outras op&ccedil;&otilde;es do estoque.</span>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detailsDialog" class="details-dialog">
+    <div id="detailsContent"></div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

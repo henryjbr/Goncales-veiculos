@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gon&ccedil;ales Ve&iacute;culos | &Aacute;rea do dono</title>
+  <meta name="description" content="Painel para gerenciar ve&iacute;culos da Gon&ccedil;ales Ve&iacute;culos.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="admin">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Gon&ccedil;ales Ve&iacute;culos">
+      <span class="brand-logo">
+        <img src="assets/logo-header.png" alt="Logo Gon&ccedil;ales Ve&iacute;culos">
+      </span>
+      <span>Gon&ccedil;ales Ve&iacute;culos</span>
+    </a>
+
+    <nav class="nav-tabs" aria-label="P&aacute;ginas">
+      <a href="index.html">Cat&aacute;logo</a>
+      <a class="is-active" href="admin.html">&Aacute;rea do dono</a>
+    </nav>
+  </header>
+
+  <main class="admin-shell">
+    <section class="admin-panel">
+      <div class="section-title">
+        <p>Gest&atilde;o de estoque</p>
+        <h1>&Aacute;rea do dono</h1>
+      </div>
+
+      <form id="loginForm" class="login-panel">
+        <label class="field">
+          <span>E-mail do dono</span>
+          <input id="adminEmail" type="email" autocomplete="email" placeholder="dono@email.com">
+        </label>
+
+        <label class="field">
+          <span>Senha</span>
+          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Senha do Supabase">
+        </label>
+
+        <button class="secondary-button" type="submit">Entrar</button>
+        <button id="logoutButton" class="quiet-button" type="button" hidden>Sair</button>
+      </form>
+
+      <form id="settingsForm" class="settings-line" hidden>
+        <label class="field">
+          <span>WhatsApp da loja</span>
+          <input id="storeWhatsapp" type="tel" inputmode="numeric" placeholder="5511999999999">
+        </label>
+        <button class="secondary-button" type="submit">Salvar contato</button>
+      </form>
+
+      <form id="vehicleForm" class="vehicle-form" hidden>
+        <input id="vehicleId" type="hidden">
+
+        <div class="form-grid">
+          <label class="field span-2">
+            <span>Modelo</span>
+            <input id="carName" required type="text" placeholder="Toyota Corolla Cross">
+          </label>
+
+          <label class="field span-2">
+            <span>Vers&atilde;o</span>
+            <input id="carVersion" required type="text" placeholder="2.0 VVT-IE Flex XR Direct Shift">
+          </label>
+
+          <label class="field">
+            <span>Ano</span>
+            <input id="carYear" required type="text" placeholder="2024/2025">
+          </label>
+
+          <label class="field">
+            <span>Quilometragem</span>
+            <input id="carMileage" required type="number" min="0" step="1" placeholder="18000">
+          </label>
+
+          <label class="field">
+            <span>Valor</span>
+            <input id="carPrice" required type="text" inputmode="decimal" placeholder="131.999,00">
+          </label>
+
+          <label class="field">
+            <span>Status</span>
+            <select id="carStatus">
+              <option value="published">Publicado</option>
+              <option value="reserved">Reservado</option>
+              <option value="draft">Rascunho</option>
+              <option value="sold">Vendido</option>
+              <option value="archived">Arquivado</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Combust&iacute;vel</span>
+            <select id="carFuel">
+              <option value="flex">Flex</option>
+              <option value="gasolina">Gasolina</option>
+              <option value="diesel">Diesel</option>
+              <option value="hibrido">H&iacute;brido</option>
+              <option value="eletrico">El&eacute;trico</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>C&acirc;mbio</span>
+            <select id="carTransmission">
+              <option value="automatico">Autom&aacute;tico</option>
+              <option value="manual">Manual</option>
+              <option value="cvt">CVT</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Cor</span>
+            <input id="carColor" required type="text" placeholder="Branco">
+          </label>
+
+          <label class="field">
+            <span>Foto por link</span>
+            <input id="carPhoto" type="url" placeholder="https://...">
+          </label>
+
+          <label class="field span-2">
+            <span>Enviar foto</span>
+            <input id="carPhotoFile" type="file" accept="image/*">
+          </label>
+
+          <label class="field span-2">
+            <span>Destaques</span>
+            <input id="carHighlights" type="text" placeholder="Blindado, revisado, &uacute;nico dono">
+          </label>
+
+          <label class="field">
+            <span>Motor</span>
+            <input id="carEngine" type="text" placeholder="2.0 turbo, 1.0 TSI">
+          </label>
+
+          <label class="field">
+            <span>Cavalagem</span>
+            <input id="carHorsepower" type="number" min="0" step="1" placeholder="177">
+          </label>
+
+          <label class="field">
+            <span>Torque</span>
+            <input id="carTorque" type="text" placeholder="21,4 kgfm">
+          </label>
+
+          <label class="field">
+            <span>Tra&ccedil;&atilde;o</span>
+            <input id="carDrivetrain" type="text" placeholder="Dianteira, 4x4">
+          </label>
+
+          <label class="field">
+            <span>Portas</span>
+            <input id="carDoors" type="number" min="2" max="6" step="1" placeholder="4">
+          </label>
+
+          <label class="field">
+            <span>Lugares</span>
+            <input id="carSeats" type="number" min="1" max="9" step="1" placeholder="5">
+          </label>
+
+          <label class="field">
+            <span>Final da placa</span>
+            <input id="carPlateFinal" type="text" maxlength="1" placeholder="7">
+          </label>
+
+          <label class="field">
+            <span>Ordem</span>
+            <input id="carSortOrder" type="number" step="1" placeholder="10">
+          </label>
+
+          <label class="field span-2">
+            <span>Observa&ccedil;&otilde;es</span>
+            <textarea id="carDescription" rows="4" placeholder="Hist&oacute;rico, opcionais, condi&ccedil;&otilde;es de negocia&ccedil;&atilde;o"></textarea>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button id="saveVehicleButton" class="primary-button" type="submit">Salvar ve&iacute;culo</button>
+          <button id="resetFormButton" class="quiet-button" type="button">Limpar</button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="inventory-panel" hidden>
+      <div class="section-title">
+        <p>Publicados no cat&aacute;logo</p>
+        <h2>Estoque cadastrado</h2>
+      </div>
+
+      <div id="adminList" class="admin-list"></div>
+
+      <div id="adminEmpty" class="empty-state compact" hidden>
+        <strong>Nenhum carro cadastrado</strong>
+        <span>Cadastre o primeiro ve&iacute;culo para preencher o cat&aacute;logo.</span>
+      </div>
+    </aside>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
