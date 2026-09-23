@@ -21,7 +21,7 @@ const TRANSMISSION_LABELS = {
 const DEMO_SETTINGS = {
   whatsapp: ""
 };
-const DEFAULT_OWNER_EMAIL = "henryjbrosal@gmail.com";
+const SUPABASE_CONNECTION_ERROR = "Supabase indisponivel. Reative o projeto ou confira URL e anon key.";
 const DEMO_VEHICLES = [
   {
     id: "demo-corolla-cross",
@@ -97,6 +97,19 @@ const DEMO_VEHICLES = [
 let vehiclesCache = [];
 let settingsCache = { whatsapp: "" };
 let usingDemoData = false;
+const loaderStartedAt = Date.now();
+
+document.body.classList.add("is-loading");
+
+function finishPageLoading() {
+  const elapsed = Date.now() - loaderStartedAt;
+  const delay = Math.max(0, 250 - elapsed);
+
+  window.setTimeout(() => {
+    document.body.classList.remove("is-loading");
+    document.body.classList.add("is-ready");
+  }, delay);
+}
 
 function createClient() {
   const config = window.GONCALES_SUPABASE || {};
@@ -107,9 +120,8 @@ function createClient() {
 
   return window.supabase.createClient(config.url, config.anonKey, {
     auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      storageKey: "goncales-admin-auth"
+      autoRefreshToken: false,
+      persistSession: false
     }
   });
 }
@@ -191,30 +203,42 @@ function showToast(message) {
   }, 2600);
 }
 
-function friendlyAuthMessage(error) {
-  const message = String(error?.message || "Erro ao autenticar");
+function isSupabaseConnectionError(error) {
+  const message = String(error?.message || error || "").toLowerCase();
+  const details = String(error?.details || error?.hint || "").toLowerCase();
+  const status = Number(error?.status || error?.code || 0);
+  const text = `${message} ${details}`;
 
-  if (message.toLowerCase().includes("invalid login credentials")) {
-    return "E-mail ou senha incorretos.";
-  }
+  return status === 521
+    || text.includes("failed to fetch")
+    || text.includes("fetch failed")
+    || text.includes("load failed")
+    || text.includes("networkerror")
+    || text.includes("network request failed")
+    || text.includes("web server is down")
+    || text.includes("unexpected token '<'");
+}
 
-  if (message.toLowerCase().includes("email not confirmed")) {
-    return "Confirme o e-mail do usuário no Supabase ou desative a confirmação de e-mail.";
-  }
-
-  return message;
+function friendlySupabaseConnectionMessage(error) {
+  return isSupabaseConnectionError(error) ? SUPABASE_CONNECTION_ERROR : "";
 }
 
 function friendlyDatabaseMessage(error) {
+  const connectionMessage = friendlySupabaseConnectionMessage(error);
+
+  if (connectionMessage) {
+    return connectionMessage;
+  }
+
   const message = String(error?.message || "Erro no banco de dados");
   const normalized = message.toLowerCase();
 
   if (normalized.includes("row-level security") || normalized.includes("permission denied")) {
-    return "Seu usuario ainda nao esta liberado como dono. Rode o SQL atualizado em database/supabase-schema.sql e entre novamente.";
+    return "Permissoes do painel sem login ainda nao foram aplicadas. Rode database/fix-owner-admin.sql no Supabase.";
   }
 
   if (normalized.includes("could not find the function") && normalized.includes("claim_owner_admin")) {
-    return "Rode o SQL atualizado em database/supabase-schema.sql para liberar o painel do dono.";
+    return "Rode database/fix-owner-admin.sql no Supabase para liberar o painel sem login.";
   }
 
   if (normalized.includes("not allowed to manage this store")) {
@@ -222,42 +246,6 @@ function friendlyDatabaseMessage(error) {
   }
 
   return message;
-}
-
-async function ensureAdminAccess(client) {
-  const config = window.GONCALES_SUPABASE || {};
-  const ownerEmail = String(config.ownerEmail || DEFAULT_OWNER_EMAIL).toLowerCase();
-  const { data: userData, error: userError } = await client.auth.getUser();
-
-  if (userError) {
-    throw userError;
-  }
-
-  const currentEmail = String(userData.user?.email || "").toLowerCase();
-
-  if (currentEmail !== ownerEmail) {
-    throw new Error("This user is not allowed to manage this store");
-  }
-
-  const { error } = await client.rpc("claim_owner_admin");
-
-  if (error) {
-    const message = String(error.message || "").toLowerCase();
-
-    if (message.includes("could not find the function")) {
-      const { data: adminRow } = await client
-        .from("app_admins")
-        .select("user_id")
-        .eq("user_id", userData.user.id)
-        .maybeSingle();
-
-      if (adminRow) {
-        return;
-      }
-    }
-
-    throw error;
-  }
 }
 
 async function fetchSettings() {
@@ -532,7 +520,7 @@ async function initCatalog() {
     settingsCache = DEMO_SETTINGS;
     vehiclesCache = [...DEMO_VEHICLES];
     usingDemoData = true;
-    showToast("Usando estoque de demonstração até configurar o Supabase");
+    showToast(`${friendlyDatabaseMessage(error)} Exibindo estoque demo.`);
   }
 
   fillSelect(fuel, uniqueOptions(vehiclesCache, "fuel", FUEL_LABELS));
@@ -719,31 +707,25 @@ async function uploadVehicleImage(file) {
 function setAdminEnabled(enabled) {
   document.body.classList.toggle("admin-login-mode", !enabled);
   document.body.classList.toggle("admin-active-mode", enabled);
-  document.querySelector("#loginForm").toggleAttribute("hidden", enabled);
-  document.querySelector("#adminStatus").toggleAttribute("hidden", !enabled);
-  document.querySelector("#settingsForm").toggleAttribute("hidden", !enabled);
-  document.querySelector("#vehicleForm").toggleAttribute("hidden", !enabled);
-  document.querySelector(".inventory-panel").toggleAttribute("hidden", !enabled);
+  document.querySelector("#adminStatus")?.toggleAttribute("hidden", !enabled);
+  document.querySelector("#settingsForm")?.toggleAttribute("hidden", !enabled);
+  document.querySelector("#vehicleForm")?.toggleAttribute("hidden", !enabled);
+  document.querySelector(".inventory-panel")?.toggleAttribute("hidden", !enabled);
 }
 
 function setAdminEmail(email) {
   const label = document.querySelector("#adminSessionEmail");
 
   if (label) {
-    label.textContent = email || "Dono conectado";
+    label.textContent = email || "Painel liberado";
   }
 }
 
 function setSetupNoticeVisible(visible) {
   const setupNotice = document.querySelector("#setupNotice");
-  const loginForm = document.querySelector("#loginForm");
 
   if (setupNotice) {
     setupNotice.hidden = !visible;
-  }
-
-  if (loginForm) {
-    loginForm.hidden = visible;
   }
 }
 
@@ -759,9 +741,6 @@ async function initAdmin() {
   let vehicles = [];
   const form = document.querySelector("#vehicleForm");
   const settingsForm = document.querySelector("#settingsForm");
-  const loginForm = document.querySelector("#loginForm");
-  const togglePasswordButton = document.querySelector("#togglePasswordButton");
-  const logoutButton = document.querySelector("#logoutButton");
   const list = document.querySelector("#adminList");
   const empty = document.querySelector("#adminEmpty");
 
@@ -777,62 +756,14 @@ async function initAdmin() {
     await renderList();
   }
 
-  const { data: sessionData } = await client.auth.getSession();
-  setAdminEmail(sessionData.session?.user?.email);
-  setAdminEnabled(false);
+  setAdminEmail();
+  setAdminEnabled(true);
 
-  if (sessionData.session) {
-    try {
-      await ensureAdminAccess(client);
-      setAdminEnabled(true);
-      await loadAdminData();
-    } catch (error) {
-      await client.auth.signOut();
-      setAdminEmail("");
-      showToast(friendlyDatabaseMessage(error));
-    }
+  try {
+    await loadAdminData();
+  } catch (error) {
+    showToast(friendlyDatabaseMessage(error));
   }
-
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const email = document.querySelector("#adminEmail").value.trim();
-    const password = document.querySelector("#adminPassword").value;
-    const { error } = await client.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      showToast(friendlyAuthMessage(error));
-      return;
-    }
-
-    try {
-      await ensureAdminAccess(client);
-      setAdminEnabled(true);
-      const { data: userData } = await client.auth.getUser();
-      setAdminEmail(userData.user?.email || email);
-      await loadAdminData();
-      showToast("Login realizado");
-    } catch (adminError) {
-      await client.auth.signOut();
-      setAdminEnabled(false);
-      showToast(friendlyDatabaseMessage(adminError));
-    }
-  });
-
-  logoutButton.addEventListener("click", async () => {
-    await client.auth.signOut();
-    setAdminEnabled(false);
-    setAdminEmail("");
-    showToast("Sessão encerrada");
-  });
-
-  togglePasswordButton.addEventListener("click", () => {
-    const passwordInput = document.querySelector("#adminPassword");
-    const showingPassword = passwordInput.type === "text";
-
-    passwordInput.type = showingPassword ? "password" : "text";
-    togglePasswordButton.textContent = showingPassword ? "Ver" : "Ocultar";
-    togglePasswordButton.setAttribute("aria-label", showingPassword ? "Mostrar senha" : "Ocultar senha");
-  });
 
   settingsForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -924,10 +855,14 @@ document.addEventListener("click", (event) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   if (document.body.dataset.page === "catalog") {
-    initCatalog().catch((error) => showToast(error.message));
+    initCatalog()
+      .catch((error) => showToast(friendlyDatabaseMessage(error)))
+      .finally(finishPageLoading);
   }
 
   if (document.body.dataset.page === "admin") {
-    initAdmin().catch((error) => showToast(error.message));
+    initAdmin()
+      .catch((error) => showToast(friendlyDatabaseMessage(error)))
+      .finally(finishPageLoading);
   }
 });

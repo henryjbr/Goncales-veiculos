@@ -3,17 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gon&ccedil;ales Ve&iacute;culos | &Aacute;rea do dono</title>
+  <title>Gon&ccedil;alez Ve&iacute;culos | &Aacute;rea do dono</title>
   <meta name="description" content="Painel para gerenciar ve&iacute;culos da Gon&ccedil;ales Ve&iacute;culos.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="admin">
+  <div id="pageLoader" class="page-loader" aria-live="polite" aria-label="Carregando painel">
+    <div class="loader-card">
+      <img src="assets/logo-header.png" alt="Gon&ccedil;ales Ve&iacute;culos">
+      <span>Preparando painel</span>
+      <div class="loader-track"><i></i></div>
+    </div>
+  </div>
+
   <header class="topbar">
     <a class="brand" href="index.html" aria-label="Gon&ccedil;ales Ve&iacute;culos">
       <span class="brand-logo">
         <img src="assets/logo-header.png" alt="Logo Gon&ccedil;ales Ve&iacute;culos">
       </span>
-      <span>Gon&ccedil;ales Ve&iacute;culos</span>
+      <span>Gon&ccedil;alez Ve&iacute;culos</span>
     </a>
 
     <nav class="nav-tabs" aria-label="P&aacute;ginas">
@@ -31,39 +39,16 @@
 
       <div id="adminStatus" class="admin-status" hidden>
         <div>
-          <span>Sess&atilde;o ativa</span>
-          <strong id="adminSessionEmail">Dono conectado</strong>
+          <span>Acesso direto</span>
+          <strong id="adminSessionEmail">Painel liberado</strong>
         </div>
-        <button id="logoutButton" class="quiet-button" type="button">Sair</button>
       </div>
 
       <div id="setupNotice" class="setup-notice" hidden>
         <strong>Supabase ainda n&atilde;o configurado</strong>
-        <p>Preencha a URL e a anon key em <code>js/supabase-config.js</code>, rode o SQL em <code>database/supabase-schema.sql</code> e crie o usu&aacute;rio do dono em Authentication.</p>
+        <p>Preencha a URL e a anon key em <code>js/supabase-config.js</code> e rode o SQL em <code>database/supabase-schema.sql</code>.</p>
         <a class="secondary-button" href="index.html">Ver cat&aacute;logo demo</a>
       </div>
-
-      <form id="loginForm" class="login-panel">
-        <div class="login-heading">
-          <span>Acesso restrito</span>
-          <strong>Entrar no painel</strong>
-        </div>
-
-        <label class="field">
-          <span>E-mail do dono</span>
-          <input id="adminEmail" type="email" autocomplete="email" placeholder="dono@email.com" value="henryjbrosal@gmail.com">
-        </label>
-
-        <label class="field">
-          <span>Senha</span>
-          <span class="password-control">
-            <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Senha">
-            <button id="togglePasswordButton" class="password-toggle" type="button" aria-label="Mostrar senha">Ver</button>
-          </span>
-        </label>
-
-        <button class="secondary-button" type="submit">Entrar</button>
-      </form>
 
       <form id="settingsForm" class="settings-line" hidden>
         <label class="field">

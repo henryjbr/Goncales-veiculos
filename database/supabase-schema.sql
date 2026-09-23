@@ -1,17 +1,16 @@
--- Gonçales Veículos - Supabase secure schema
+-- Gonçales Veículos - Supabase schema
 -- Cole este arquivo no SQL Editor do Supabase.
 --
 -- Antes de rodar:
--- 1. Crie o login do dono em Authentication > Users.
--- 2. Confirme se o e-mail do dono no bloco "Bootstrap do dono" está correto.
--- 3. Rode o SQL inteiro.
+-- 1. Confirme a URL e anon key em js/supabase-config.js.
+-- 2. Rode o SQL inteiro.
 --
--- Modelo de segurança:
--- - O catálogo público só enxerga veículos publicados e disponíveis.
--- - Somente usuários cadastrados em public.app_admins podem criar/editar/remover.
+-- Modelo de acesso:
+-- - O catálogo público consulta somente veículos publicados e reservados pelo frontend.
+-- - A área do dono abre sem login e pode criar/editar/remover usando a anon key.
 -- - RLS fica ativa em todas as tabelas públicas.
 -- - Imagens ficam em bucket público para o site estático conseguir exibir,
---   mas upload/update/delete são restritos aos donos autenticados.
+--   e upload/update/delete ficam liberados para o painel sem login.
 --
 -- Importante:
 -- Nunca use a service_role key no frontend. Use somente anon/public key no site.
@@ -276,9 +275,9 @@ grant select on table public.store_settings to anon, authenticated;
 grant select on table public.vehicles to anon, authenticated;
 grant select on table public.vehicle_images to anon, authenticated;
 
-grant insert, update, delete on table public.store_settings to authenticated;
-grant insert, update, delete on table public.vehicles to authenticated;
-grant insert, update, delete on table public.vehicle_images to authenticated;
+grant insert, update, delete on table public.store_settings to anon, authenticated;
+grant insert, update, delete on table public.vehicles to anon, authenticated;
+grant insert, update, delete on table public.vehicle_images to anon, authenticated;
 grant select on table public.app_admins to authenticated;
 
 drop policy if exists "Admins can read admin list" on public.app_admins;
@@ -296,91 +295,83 @@ to anon, authenticated
 using (true);
 
 drop policy if exists "Admins can update store settings" on public.store_settings;
-create policy "Admins can update store settings"
+drop policy if exists "Owner panel can update store settings without login" on public.store_settings;
+create policy "Owner panel can update store settings without login"
 on public.store_settings
 for update
-to authenticated
-using (public.is_app_admin())
-with check (public.is_app_admin());
+to anon, authenticated
+using (true)
+with check (true);
 
 drop policy if exists "Public can read available vehicles" on public.vehicles;
-create policy "Public can read available vehicles"
+drop policy if exists "Owner panel can read all vehicles without login" on public.vehicles;
+create policy "Owner panel can read all vehicles without login"
 on public.vehicles
 for select
 to anon, authenticated
-using (status in ('published', 'reserved'));
+using (true);
 
 drop policy if exists "Admins can read all vehicles" on public.vehicles;
-create policy "Admins can read all vehicles"
-on public.vehicles
-for select
-to authenticated
-using (public.is_app_admin());
 
 drop policy if exists "Admins can insert vehicles" on public.vehicles;
-create policy "Admins can insert vehicles"
+drop policy if exists "Owner panel can insert vehicles without login" on public.vehicles;
+create policy "Owner panel can insert vehicles without login"
 on public.vehicles
 for insert
-to authenticated
-with check (public.is_app_admin());
+to anon, authenticated
+with check (true);
 
 drop policy if exists "Admins can update vehicles" on public.vehicles;
-create policy "Admins can update vehicles"
+drop policy if exists "Owner panel can update vehicles without login" on public.vehicles;
+create policy "Owner panel can update vehicles without login"
 on public.vehicles
 for update
-to authenticated
-using (public.is_app_admin())
-with check (public.is_app_admin());
+to anon, authenticated
+using (true)
+with check (true);
 
 drop policy if exists "Admins can delete vehicles" on public.vehicles;
-create policy "Admins can delete vehicles"
+drop policy if exists "Owner panel can delete vehicles without login" on public.vehicles;
+create policy "Owner panel can delete vehicles without login"
 on public.vehicles
 for delete
-to authenticated
-using (public.is_app_admin());
+to anon, authenticated
+using (true);
 
 drop policy if exists "Public can read images for available vehicles" on public.vehicle_images;
-create policy "Public can read images for available vehicles"
+drop policy if exists "Owner panel can read vehicle images without login" on public.vehicle_images;
+create policy "Owner panel can read vehicle images without login"
 on public.vehicle_images
 for select
 to anon, authenticated
-using (
-  exists (
-    select 1
-    from public.vehicles v
-    where v.id = vehicle_images.vehicle_id
-      and v.status in ('published', 'reserved')
-  )
-);
+using (true);
 
 drop policy if exists "Admins can read all vehicle images" on public.vehicle_images;
-create policy "Admins can read all vehicle images"
-on public.vehicle_images
-for select
-to authenticated
-using (public.is_app_admin());
 
 drop policy if exists "Admins can insert vehicle images" on public.vehicle_images;
-create policy "Admins can insert vehicle images"
+drop policy if exists "Owner panel can insert vehicle images without login" on public.vehicle_images;
+create policy "Owner panel can insert vehicle images without login"
 on public.vehicle_images
 for insert
-to authenticated
-with check (public.is_app_admin());
+to anon, authenticated
+with check (true);
 
 drop policy if exists "Admins can update vehicle images" on public.vehicle_images;
-create policy "Admins can update vehicle images"
+drop policy if exists "Owner panel can update vehicle images without login" on public.vehicle_images;
+create policy "Owner panel can update vehicle images without login"
 on public.vehicle_images
 for update
-to authenticated
-using (public.is_app_admin())
-with check (public.is_app_admin());
+to anon, authenticated
+using (true)
+with check (true);
 
 drop policy if exists "Admins can delete vehicle images" on public.vehicle_images;
-create policy "Admins can delete vehicle images"
+drop policy if exists "Owner panel can delete vehicle images without login" on public.vehicle_images;
+create policy "Owner panel can delete vehicle images without login"
 on public.vehicle_images
 for delete
-to authenticated
-using (public.is_app_admin());
+to anon, authenticated
+using (true);
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
@@ -404,41 +395,39 @@ to anon, authenticated
 using (bucket_id = 'vehicle-images');
 
 drop policy if exists "Admins can upload vehicle images" on storage.objects;
-create policy "Admins can upload vehicle images"
+drop policy if exists "Owner panel can upload vehicle images without login" on storage.objects;
+create policy "Owner panel can upload vehicle images without login"
 on storage.objects
 for insert
-to authenticated
+to anon, authenticated
 with check (
   bucket_id = 'vehicle-images'
-  and public.is_app_admin()
 );
 
 drop policy if exists "Admins can update vehicle images" on storage.objects;
-create policy "Admins can update vehicle images"
+drop policy if exists "Owner panel can update stored vehicle images without login" on storage.objects;
+create policy "Owner panel can update stored vehicle images without login"
 on storage.objects
 for update
-to authenticated
+to anon, authenticated
 using (
   bucket_id = 'vehicle-images'
-  and public.is_app_admin()
 )
 with check (
   bucket_id = 'vehicle-images'
-  and public.is_app_admin()
 );
 
 drop policy if exists "Admins can delete vehicle images" on storage.objects;
-create policy "Admins can delete vehicle images"
+drop policy if exists "Owner panel can delete stored vehicle images without login" on storage.objects;
+create policy "Owner panel can delete stored vehicle images without login"
 on storage.objects
 for delete
-to authenticated
+to anon, authenticated
 using (
   bucket_id = 'vehicle-images'
-  and public.is_app_admin()
 );
 
--- Bootstrap do dono:
--- Rode este bloco depois de criar o usuário em Authentication.
+-- Compatibilidade com instalacoes antigas que ainda tenham dono autenticado.
 insert into public.app_admins (user_id)
 select id
 from auth.users
