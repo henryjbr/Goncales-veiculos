@@ -1236,10 +1236,13 @@ body.toast-visible::after {
   body[data-page="catalog"] .brand-logo {
     width: 118px;
     height: 64px;
+    padding: 4px 8px;
+    background: #ffffff;
+    border-radius: 4px;
   }
 
   body[data-page="catalog"] .brand-logo img {
-    filter: brightness(0) invert(1);
+    filter: none;
   }
 
   body[data-page="catalog"] .brand > span:last-child {
