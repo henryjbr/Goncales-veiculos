@@ -1,4 +1,5 @@
 const DEFAULT_PHOTO = "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=82";
+const MAX_VEHICLE_PHOTOS = 10;
 const STATUS_LABELS = {
   archived: "Arquivado",
   draft: "Rascunho",
@@ -182,8 +183,54 @@ function labelFrom(map, value) {
   return map[value] || value || "-";
 }
 
+function storedVehicleImages(vehicle) {
+  const images = Array.isArray(vehicle.vehicle_images) ? [...vehicle.vehicle_images] : [];
+
+  return images
+    .filter((image) => image?.image_url)
+    .sort((a, b) => {
+      const order = Number(a.sort_order || 0) - Number(b.sort_order || 0);
+      return order || String(a.created_at || "").localeCompare(String(b.created_at || ""));
+    });
+}
+
+function vehiclePhotos(vehicle) {
+  const photos = [];
+  const seen = new Set();
+
+  function addPhoto(url, id = "", altText = "") {
+    const cleanUrl = String(url || "").trim();
+
+    if (!cleanUrl || seen.has(cleanUrl)) {
+      return;
+    }
+
+    seen.add(cleanUrl);
+    photos.push({
+      id,
+      url: cleanUrl,
+      altText: altText || vehicle.name || "Veiculo"
+    });
+  }
+
+  addPhoto(vehicle.cover_image_url, "", vehicle.name);
+  storedVehicleImages(vehicle).forEach((image) => {
+    addPhoto(image.image_url, image.id, image.alt_text || vehicle.name);
+  });
+
+  if (!photos.length) {
+    addPhoto(DEFAULT_PHOTO, "", vehicle.name);
+  }
+
+  return photos.slice(0, MAX_VEHICLE_PHOTOS);
+}
+
 function vehiclePhoto(vehicle) {
-  return vehicle.cover_image_url || DEFAULT_PHOTO;
+  return vehiclePhotos(vehicle)[0]?.url || DEFAULT_PHOTO;
+}
+
+function vehiclePhotoCount(vehicle) {
+  return vehiclePhotos(vehicle).filter((photo) => photo.url !== DEFAULT_PHOTO).length;
 }
 
 function buildWhatsAppUrl(vehicle) {
@@ -245,6 +292,10 @@ function friendlyDatabaseMessage(error) {
     return "Este e-mail nao esta autorizado a gerenciar a loja.";
   }
 
+  if (normalized.includes("maximo 10 fotos")) {
+    return "Cada veiculo pode ter no maximo 10 fotos.";
+  }
+
   return message;
 }
 
@@ -280,7 +331,7 @@ async function fetchVehicles({ admin = false } = {}) {
   const client = requireSupabase();
   let query = client
     .from("vehicles")
-    .select("*")
+    .select("*, vehicle_images(id, image_url, alt_text, sort_order, created_at)")
     .order("sort_order", { ascending: false })
     .order("created_at", { ascending: false });
 
@@ -327,11 +378,14 @@ function detailRows(vehicle) {
 }
 
 function vehicleCard(vehicle) {
+  const photoCount = vehiclePhotoCount(vehicle);
+
   return `
     <article class="vehicle-card">
       <div class="vehicle-media">
         <img src="${escapeHtml(vehiclePhoto(vehicle))}" alt="${escapeHtml(vehicle.name)}" loading="lazy">
         <span class="status-badge">${escapeHtml(labelFrom(STATUS_LABELS, vehicle.status))}</span>
+        ${photoCount > 1 ? `<span class="photo-count">${photoCount} fotos</span>` : ""}
       </div>
       <div class="vehicle-body">
         <div class="vehicle-title">
@@ -461,13 +515,36 @@ function createCustomSelect(select) {
   syncCustomSelect(select);
 }
 
+function renderDetailsGallery(vehicle) {
+  const photos = vehiclePhotos(vehicle);
+  const mainPhoto = photos[0];
+  const thumbs = photos.length > 1
+    ? `
+      <div class="details-thumbs" aria-label="Fotos do veiculo">
+        ${photos.map((photo, index) => `
+          <button class="details-thumb${index === 0 ? " is-active" : ""}" type="button" data-gallery-photo="${escapeHtml(photo.url)}" aria-label="Ver foto ${index + 1}">
+            <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.altText)}" loading="lazy">
+          </button>
+        `).join("")}
+      </div>
+    `
+    : "";
+
+  return `
+    <div class="details-gallery">
+      <img class="details-main-photo" src="${escapeHtml(mainPhoto.url)}" alt="${escapeHtml(mainPhoto.altText)}">
+      ${thumbs}
+    </div>
+  `;
+}
+
 function renderDetails(vehicle) {
   const rows = detailRows(vehicle);
 
   return `
     <div class="details-card">
       <button class="details-close" type="button" aria-label="Fechar">×</button>
-      <img src="${escapeHtml(vehiclePhoto(vehicle))}" alt="${escapeHtml(vehicle.name)}">
+      ${renderDetailsGallery(vehicle)}
       <div class="details-copy">
         <span>${escapeHtml(labelFrom(STATUS_LABELS, vehicle.status))}</span>
         <h2>${escapeHtml(vehicle.name)}</h2>
@@ -590,6 +667,22 @@ async function initCatalog() {
   });
 
   dialog.addEventListener("click", (event) => {
+    const thumbnail = event.target.closest("[data-gallery-photo]");
+
+    if (thumbnail) {
+      const gallery = thumbnail.closest(".details-gallery");
+      const mainPhoto = gallery?.querySelector(".details-main-photo");
+
+      if (mainPhoto) {
+        mainPhoto.src = thumbnail.dataset.galleryPhoto;
+        gallery.querySelectorAll(".details-thumb").forEach((button) => {
+          button.classList.toggle("is-active", button === thumbnail);
+        });
+      }
+
+      return;
+    }
+
     if (event.target === dialog || event.target.closest(".details-close")) {
       dialog.close();
     }
@@ -598,9 +691,23 @@ async function initCatalog() {
   applyFilters();
 }
 
+function updatePhotoHelp(existingCount = 0, selectedCount = 0) {
+  const help = document.querySelector("#carPhotoHelp");
+
+  if (!help) {
+    return;
+  }
+
+  const total = existingCount + selectedCount;
+  help.textContent = total > 0
+    ? `${total} de ${MAX_VEHICLE_PHOTOS} fotos cadastradas ou selecionadas.`
+    : `Escolha ate ${MAX_VEHICLE_PHOTOS} imagens da galeria do celular.`;
+}
+
 function resetForm(form) {
   form.reset();
   document.querySelector("#vehicleId").value = "";
+  updatePhotoHelp();
   document.querySelector("#saveVehicleButton").textContent = "Salvar veículo";
 }
 
@@ -657,11 +764,14 @@ function fillForm(vehicle) {
   document.querySelector("#carSortOrder").value = vehicle.sort_order || "";
   document.querySelector("#carDescription").value = vehicle.description || "";
   document.querySelector("#carPhotoFile").value = "";
+  updatePhotoHelp(storedVehicleImages(vehicle).length);
   document.querySelector("#saveVehicleButton").textContent = "Atualizar veículo";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function adminCard(vehicle) {
+  const photoCount = vehiclePhotoCount(vehicle);
+
   return `
     <article class="admin-card" data-id="${escapeHtml(vehicle.id)}">
       <img src="${escapeHtml(vehiclePhoto(vehicle))}" alt="${escapeHtml(vehicle.name)}" loading="lazy">
@@ -669,6 +779,7 @@ function adminCard(vehicle) {
         <div>
           <h3>${escapeHtml(vehicle.name)}</h3>
           <p>${escapeHtml(vehicle.version)}</p>
+          ${photoCount > 1 ? `<span class="admin-photo-count">${photoCount} fotos</span>` : ""}
         </div>
         <strong>${formatCurrencyFromCents(vehicle.price_cents)}</strong>
         <div class="admin-card-actions">
@@ -702,6 +813,37 @@ async function uploadVehicleImage(file) {
     .getPublicUrl(path);
 
   return data.publicUrl;
+}
+
+async function uploadVehicleImages(files) {
+  const urls = [];
+
+  for (const file of files) {
+    urls.push(await uploadVehicleImage(file));
+  }
+
+  return urls;
+}
+
+async function insertVehicleImages(client, vehicleId, urls, vehicleName, startOrder = 0) {
+  const rows = urls.map((url, index) => ({
+    vehicle_id: vehicleId,
+    image_url: url,
+    alt_text: vehicleName,
+    sort_order: startOrder + index
+  }));
+
+  if (!rows.length) {
+    return;
+  }
+
+  const { error } = await client
+    .from("vehicle_images")
+    .insert(rows);
+
+  if (error) {
+    throw error;
+  }
 }
 
 function setAdminEnabled(enabled) {
@@ -743,6 +885,37 @@ async function initAdmin() {
   const settingsForm = document.querySelector("#settingsForm");
   const list = document.querySelector("#adminList");
   const empty = document.querySelector("#adminEmpty");
+  const photoInput = document.querySelector("#carPhotoFile");
+
+  function currentEditingVehicle() {
+    const currentId = document.querySelector("#vehicleId").value;
+    return currentId ? vehicles.find((item) => item.id === currentId) : null;
+  }
+
+  function existingPhotoCountForCurrentVehicle() {
+    const vehicle = currentEditingVehicle();
+    return vehicle ? storedVehicleImages(vehicle).length : 0;
+  }
+
+  function selectedPhotoFiles() {
+    return Array.from(photoInput?.files || []);
+  }
+
+  function validateSelectedPhotoLimit() {
+    const existingCount = existingPhotoCountForCurrentVehicle();
+    const files = selectedPhotoFiles();
+    const total = existingCount + files.length;
+
+    if (total > MAX_VEHICLE_PHOTOS) {
+      photoInput.value = "";
+      updatePhotoHelp(existingCount);
+      showToast(`Cada veiculo pode ter no maximo ${MAX_VEHICLE_PHOTOS} fotos`);
+      return false;
+    }
+
+    updatePhotoHelp(existingCount, files.length);
+    return true;
+  }
 
   async function renderList() {
     vehicles = await fetchVehicles({ admin: true });
@@ -758,6 +931,7 @@ async function initAdmin() {
 
   setAdminEmail();
   setAdminEnabled(true);
+  updatePhotoHelp();
 
   try {
     await loadAdminData();
@@ -781,28 +955,45 @@ async function initAdmin() {
     showToast("Contato salvo");
   });
 
+  photoInput?.addEventListener("change", validateSelectedPhotoLimit);
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const currentId = document.querySelector("#vehicleId").value;
-    const file = document.querySelector("#carPhotoFile").files[0];
+    const files = selectedPhotoFiles();
+    const existingImageCount = existingPhotoCountForCurrentVehicle();
     const vehicle = vehicleFromForm();
 
-    try {
-      const uploadedUrl = await uploadVehicleImage(file);
+    if (!validateSelectedPhotoLimit()) {
+      return;
+    }
 
-      if (uploadedUrl) {
-        vehicle.cover_image_url = uploadedUrl;
+    try {
+      const uploadedUrls = await uploadVehicleImages(files);
+
+      if (uploadedUrls[0]) {
+        vehicle.cover_image_url = uploadedUrls[0];
       }
 
+      let savedVehicleId = currentId;
       const result = currentId
         ? await client.from("vehicles").update(vehicle).eq("id", currentId)
-        : await client.from("vehicles").insert(vehicle);
+        : await client.from("vehicles").insert(vehicle).select("id").single();
 
       if (result.error) {
         throw result.error;
       }
 
+      if (!savedVehicleId) {
+        savedVehicleId = result.data?.id;
+      }
+
+      if (!savedVehicleId) {
+        throw new Error("Nao foi possivel identificar o veiculo salvo.");
+      }
+
+      await insertVehicleImages(client, savedVehicleId, uploadedUrls, vehicle.name, existingImageCount);
       await renderList();
       resetForm(form);
       showToast(currentId ? "Veículo atualizado" : "Veículo publicado");

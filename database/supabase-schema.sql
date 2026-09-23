@@ -176,6 +176,29 @@ create index if not exists vehicles_public_catalog_idx
 create index if not exists vehicle_images_vehicle_idx
   on public.vehicle_images (vehicle_id, sort_order asc, created_at asc);
 
+create or replace function public.enforce_vehicle_images_limit()
+returns trigger
+language plpgsql
+as $$
+begin
+  if (
+    select count(*)
+    from public.vehicle_images
+    where vehicle_id = new.vehicle_id
+      and id <> coalesce(new.id, '00000000-0000-0000-0000-000000000000'::uuid)
+  ) >= 10 then
+    raise exception 'Cada veiculo pode ter no maximo 10 fotos.';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists vehicle_images_limit_trigger on public.vehicle_images;
+create trigger vehicle_images_limit_trigger
+before insert or update of vehicle_id on public.vehicle_images
+for each row execute function public.enforce_vehicle_images_limit();
+
 create or replace function public.is_app_admin()
 returns boolean
 language sql
@@ -379,7 +402,7 @@ values (
   'vehicle-images',
   true,
   5242880,
-  array['image/jpeg', 'image/png', 'image/webp']
+  array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
 )
 on conflict (id) do update
 set

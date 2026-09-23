@@ -9,6 +9,33 @@ grant insert, update, delete on table public.store_settings to anon, authenticat
 grant insert, update, delete on table public.vehicles to anon, authenticated;
 grant insert, update, delete on table public.vehicle_images to anon, authenticated;
 
+create or replace function public.enforce_vehicle_images_limit()
+returns trigger
+language plpgsql
+as $$
+begin
+  if (
+    select count(*)
+    from public.vehicle_images
+    where vehicle_id = new.vehicle_id
+      and id <> coalesce(new.id, '00000000-0000-0000-0000-000000000000'::uuid)
+  ) >= 10 then
+    raise exception 'Cada veiculo pode ter no maximo 10 fotos.';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists vehicle_images_limit_trigger on public.vehicle_images;
+create trigger vehicle_images_limit_trigger
+before insert or update of vehicle_id on public.vehicle_images
+for each row execute function public.enforce_vehicle_images_limit();
+
+update storage.buckets
+set allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
+where id = 'vehicle-images';
+
 drop policy if exists "Admins can update store settings" on public.store_settings;
 drop policy if exists "Owner panel can update store settings without login" on public.store_settings;
 create policy "Owner panel can update store settings without login"
