@@ -1238,6 +1238,10 @@ body.toast-visible::after {
     height: 64px;
   }
 
+  body[data-page="catalog"] .brand-logo img {
+    filter: brightness(0) invert(1);
+  }
+
   body[data-page="catalog"] .brand > span:last-child {
     display: none;
   }
