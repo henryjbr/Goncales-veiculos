@@ -274,6 +274,13 @@ body.is-ready .page-loader {
   text-transform: uppercase;
 }
 
+.field small {
+  color: var(--steel);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .field input,
 .field select,
 .field textarea {
