@@ -594,11 +594,19 @@ body.is-ready .page-loader {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 260ms ease;
+  opacity: 1;
+  backface-visibility: hidden;
+  transition: opacity 170ms ease, transform 220ms ease;
+  will-change: opacity, transform;
 }
 
-.vehicle-card:hover .vehicle-media img {
-  transform: scale(1.035);
+.vehicle-card:hover .vehicle-media:not(.is-changing) .vehicle-card-photo {
+  transform: scale(1.025);
+}
+
+.vehicle-media.is-changing .vehicle-card-photo {
+  opacity: 0;
+  transform: scale(1.015);
 }
 
 .status-badge {

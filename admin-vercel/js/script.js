@@ -98,6 +98,7 @@ const DEMO_VEHICLES = [
 let vehiclesCache = [];
 let settingsCache = { whatsapp: "" };
 let usingDemoData = false;
+const preloadedImageUrls = new Map();
 const loaderStartedAt = Date.now();
 
 document.body.classList.add("is-loading");
@@ -447,13 +448,39 @@ function vehicleCard(vehicle) {
   `;
 }
 
-function moveCatalogPhoto(button) {
+function preloadImage(url) {
+  const cleanUrl = String(url || "").trim();
+
+  if (!cleanUrl || preloadedImageUrls.has(cleanUrl)) {
+    return preloadedImageUrls.get(cleanUrl) || Promise.resolve();
+  }
+
+  const request = new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+    image.src = cleanUrl;
+  });
+
+  preloadedImageUrls.set(cleanUrl, request);
+  return request;
+}
+
+function preloadCatalogPhotos(vehicles) {
+  vehicles.forEach((vehicle) => {
+    vehiclePhotos(vehicle).slice(1).forEach((photo) => {
+      preloadImage(photo.url);
+    });
+  });
+}
+
+async function moveCatalogPhoto(button) {
   const card = button.closest(".vehicle-card");
   const media = button.closest(".vehicle-media");
   const vehicle = vehiclesCache.find((item) => item.id === card?.dataset.vehicleId);
   const photos = vehicle ? vehiclePhotos(vehicle) : [];
 
-  if (!media || photos.length < 2) {
+  if (!media || media.dataset.isChanging === "true" || photos.length < 2) {
     return;
   }
 
@@ -464,16 +491,27 @@ function moveCatalogPhoto(button) {
   const image = media.querySelector(".vehicle-card-photo");
   const counter = media.querySelector(".photo-count");
 
-  media.dataset.photoIndex = String(nextIndex);
+  media.dataset.isChanging = "true";
+  await preloadImage(photo.url);
+  media.classList.add("is-changing");
 
-  if (image) {
-    image.src = photo.url;
-    image.alt = photo.altText;
-  }
+  window.setTimeout(() => {
+    media.dataset.photoIndex = String(nextIndex);
 
-  if (counter) {
-    counter.textContent = `${nextIndex + 1} / ${photos.length}`;
-  }
+    if (image) {
+      image.src = photo.url;
+      image.alt = photo.altText;
+    }
+
+    if (counter) {
+      counter.textContent = `${nextIndex + 1} / ${photos.length}`;
+    }
+
+    window.requestAnimationFrame(() => {
+      media.classList.remove("is-changing");
+      media.dataset.isChanging = "false";
+    });
+  }, 90);
 }
 
 function uniqueOptions(vehicles, key, labels) {
@@ -694,6 +732,7 @@ async function initCatalog() {
     total.textContent = `${vehiclesCache.length} ${vehiclesCache.length === 1 ? "carro" : "carros"}`;
     summary.textContent = `${filtered.length} ${filtered.length === 1 ? "resultado" : "resultados"} no estoque${usingDemoData ? " (demo)" : ""}`;
     grid.innerHTML = filtered.map(vehicleCard).join("");
+    preloadCatalogPhotos(filtered);
     empty.hidden = filtered.length > 0;
   }
 
