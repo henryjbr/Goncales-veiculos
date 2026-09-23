@@ -456,6 +456,16 @@ body.is-ready .page-loader {
   box-shadow: 0 0 0 3px rgba(201, 203, 209, 0.18);
 }
 
+#carMileage,
+#carPrice {
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+}
+
+#carPrice {
+  color: var(--red);
+}
+
 .catalog-panel .field input:focus,
 .catalog-panel .field select:focus {
   border-color: rgba(255, 255, 255, 0.48);
@@ -609,6 +619,7 @@ body.is-ready .page-loader {
   position: absolute;
   right: 12px;
   bottom: 12px;
+  z-index: 2;
   padding: 7px 10px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.92);
@@ -617,6 +628,40 @@ body.is-ready .page-loader {
   font-weight: 900;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.photo-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(23, 24, 28, 0.76);
+  color: var(--paper);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  transform: translateY(-50%);
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.photo-arrow:hover,
+.photo-arrow:focus-visible {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(227, 6, 19, 0.92);
+}
+
+.photo-arrow-prev {
+  left: 12px;
+}
+
+.photo-arrow-next {
+  right: 12px;
 }
 
 .vehicle-body {

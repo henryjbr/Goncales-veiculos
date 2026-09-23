@@ -170,6 +170,22 @@ function parseMoneyToCents(value) {
   return Math.round((Number.parseFloat(clean) || 0) * 100);
 }
 
+function parseFormattedInteger(value) {
+  return Number(onlyDigits(value)) || 0;
+}
+
+function formatIntegerInput(value) {
+  const digits = onlyDigits(value);
+
+  return digits ? formatMileage(digits) : "";
+}
+
+function formatMoneyInput(value) {
+  const cents = parseMoneyToCents(value);
+
+  return cents ? formatCurrencyFromCents(cents) : "";
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -378,14 +394,19 @@ function detailRows(vehicle) {
 }
 
 function vehicleCard(vehicle) {
-  const photoCount = vehiclePhotoCount(vehicle);
+  const photos = vehiclePhotos(vehicle);
+  const hasGallery = photos.length > 1;
 
   return `
-    <article class="vehicle-card">
-      <div class="vehicle-media">
-        <img src="${escapeHtml(vehiclePhoto(vehicle))}" alt="${escapeHtml(vehicle.name)}" loading="lazy">
+    <article class="vehicle-card" data-vehicle-id="${escapeHtml(vehicle.id)}">
+      <div class="vehicle-media" data-photo-index="0">
+        <img class="vehicle-card-photo" src="${escapeHtml(photos[0].url)}" alt="${escapeHtml(photos[0].altText)}" loading="lazy">
         <span class="status-badge">${escapeHtml(labelFrom(STATUS_LABELS, vehicle.status))}</span>
-        ${photoCount > 1 ? `<span class="photo-count">${photoCount} fotos</span>` : ""}
+        ${hasGallery ? `
+          <button class="photo-arrow photo-arrow-prev" type="button" data-photo-direction="-1" aria-label="Foto anterior">&lsaquo;</button>
+          <button class="photo-arrow photo-arrow-next" type="button" data-photo-direction="1" aria-label="Proxima foto">&rsaquo;</button>
+          <span class="photo-count">1 / ${photos.length}</span>
+        ` : ""}
       </div>
       <div class="vehicle-body">
         <div class="vehicle-title">
@@ -424,6 +445,35 @@ function vehicleCard(vehicle) {
       </div>
     </article>
   `;
+}
+
+function moveCatalogPhoto(button) {
+  const card = button.closest(".vehicle-card");
+  const media = button.closest(".vehicle-media");
+  const vehicle = vehiclesCache.find((item) => item.id === card?.dataset.vehicleId);
+  const photos = vehicle ? vehiclePhotos(vehicle) : [];
+
+  if (!media || photos.length < 2) {
+    return;
+  }
+
+  const direction = Number(button.dataset.photoDirection) || 1;
+  const currentIndex = Number(media.dataset.photoIndex || 0);
+  const nextIndex = (currentIndex + direction + photos.length) % photos.length;
+  const photo = photos[nextIndex];
+  const image = media.querySelector(".vehicle-card-photo");
+  const counter = media.querySelector(".photo-count");
+
+  media.dataset.photoIndex = String(nextIndex);
+
+  if (image) {
+    image.src = photo.url;
+    image.alt = photo.altText;
+  }
+
+  if (counter) {
+    counter.textContent = `${nextIndex + 1} / ${photos.length}`;
+  }
 }
 
 function uniqueOptions(vehicles, key, labels) {
@@ -659,6 +709,13 @@ async function initCatalog() {
   });
 
   grid.addEventListener("click", (event) => {
+    const photoButton = event.target.closest("[data-photo-direction]");
+
+    if (photoButton) {
+      moveCatalogPhoto(photoButton);
+      return;
+    }
+
     const button = event.target.closest("[data-details-id]");
 
     if (button) {
@@ -721,7 +778,7 @@ function vehicleFromForm() {
     name: document.querySelector("#carName").value.trim(),
     version: document.querySelector("#carVersion").value.trim(),
     model_year: document.querySelector("#carYear").value.trim(),
-    mileage_km: Number(document.querySelector("#carMileage").value) || 0,
+    mileage_km: parseFormattedInteger(document.querySelector("#carMileage").value),
     price_cents: parseMoneyToCents(document.querySelector("#carPrice").value),
     fuel: document.querySelector("#carFuel").value,
     transmission: document.querySelector("#carTransmission").value,
@@ -746,8 +803,8 @@ function fillForm(vehicle) {
   document.querySelector("#carName").value = vehicle.name || "";
   document.querySelector("#carVersion").value = vehicle.version || "";
   document.querySelector("#carYear").value = vehicle.model_year || "";
-  document.querySelector("#carMileage").value = vehicle.mileage_km || "";
-  document.querySelector("#carPrice").value = vehicle.price_cents ? formatCurrencyFromCents(vehicle.price_cents).replace("R$", "").trim() : "";
+  document.querySelector("#carMileage").value = vehicle.mileage_km ? formatIntegerInput(vehicle.mileage_km) : "";
+  document.querySelector("#carPrice").value = vehicle.price_cents ? formatCurrencyFromCents(vehicle.price_cents) : "";
   document.querySelector("#carFuel").value = vehicle.fuel || "flex";
   document.querySelector("#carTransmission").value = vehicle.transmission || "automatico";
   document.querySelector("#carColor").value = vehicle.color || "";
@@ -886,6 +943,18 @@ async function initAdmin() {
   const list = document.querySelector("#adminList");
   const empty = document.querySelector("#adminEmpty");
   const photoInput = document.querySelector("#carPhotoFile");
+  const mileageInput = document.querySelector("#carMileage");
+  const priceInput = document.querySelector("#carPrice");
+
+  function formatAdminCommercialFields() {
+    if (mileageInput) {
+      mileageInput.value = formatIntegerInput(mileageInput.value);
+    }
+
+    if (priceInput) {
+      priceInput.value = formatMoneyInput(priceInput.value);
+    }
+  }
 
   function currentEditingVehicle() {
     const currentId = document.querySelector("#vehicleId").value;
@@ -956,6 +1025,12 @@ async function initAdmin() {
   });
 
   photoInput?.addEventListener("change", validateSelectedPhotoLimit);
+  mileageInput?.addEventListener("input", () => {
+    mileageInput.value = formatIntegerInput(mileageInput.value);
+  });
+  priceInput?.addEventListener("blur", () => {
+    priceInput.value = formatMoneyInput(priceInput.value);
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -963,6 +1038,7 @@ async function initAdmin() {
     const currentId = document.querySelector("#vehicleId").value;
     const files = selectedPhotoFiles();
     const existingImageCount = existingPhotoCountForCurrentVehicle();
+    formatAdminCommercialFields();
     const vehicle = vehicleFromForm();
 
     if (!validateSelectedPhotoLimit()) {
