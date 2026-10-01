@@ -1803,13 +1803,26 @@ body.toast-visible::after {
   body[data-page="catalog"] .brand-showcase {
     margin-top: -58px;
     margin-bottom: 16px;
-    padding: 14px;
+    gap: 12px;
+    padding: 12px;
     box-shadow: 0 12px 34px rgba(17, 18, 22, 0.12);
   }
 
   .brand-showcase-head {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .brand-showcase-head div:first-child {
+    gap: 2px;
+  }
+
+  .brand-showcase-head span {
+    font-size: 0.66rem;
+  }
+
+  .brand-showcase-head strong {
+    font-size: 1.08rem;
   }
 
   .type-switch {
@@ -1819,7 +1832,9 @@ body.toast-visible::after {
   }
 
   .type-switch button {
+    min-height: 38px;
     padding-inline: 6px;
+    font-size: 0.74rem;
   }
 
   .heading-actions {
@@ -1929,24 +1944,51 @@ body.toast-visible::after {
   }
 
   .brand-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-height: 292px;
+    display: flex;
+    gap: 8px;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px 8px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
   }
 
   .brand-card {
-    grid-template-columns: 40px 1fr;
-    min-height: 68px;
-    padding: 10px;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: 40px;
+    max-width: 170px;
+    padding: 0 14px;
+    border-radius: 999px;
+    box-shadow: none;
+    scroll-snap-align: start;
   }
 
-  .brand-logo-mark {
-    width: 40px;
-    height: 40px;
+  .brand-card:hover,
+  .brand-card.is-active {
+    transform: none;
+    box-shadow: 0 8px 18px rgba(17, 18, 22, 0.1);
   }
 
-  .brand-logo-mark img {
-    width: 28px;
-    height: 28px;
+  .brand-logo-mark,
+  .brand-card-copy small {
+    display: none;
+  }
+
+  .brand-card-copy {
+    display: block;
+  }
+
+  .brand-card-copy strong {
+    display: block;
+    overflow: hidden;
+    max-width: 138px;
+    font-size: 0.78rem;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   body[data-page="catalog"] .spec-list {

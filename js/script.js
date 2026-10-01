@@ -939,6 +939,7 @@ async function initCatalog() {
   const clear = document.querySelector("#clearFilters");
   const dialog = document.querySelector("#detailsDialog");
   const brandGrid = document.querySelector("#brandGrid");
+  const brandMobileSelect = document.querySelector("#brandMobileSelect");
   const brandTitle = document.querySelector("#brandShowcaseTitle");
   const typeSwitch = document.querySelector(".type-switch");
   let selectedBrandId = "";
@@ -978,6 +979,18 @@ async function initCatalog() {
 
     if (brandTitle) {
       brandTitle.textContent = type ? `Marcas de ${VEHICLE_TYPES[type].toLowerCase()}` : "Carros e motos";
+    }
+
+    if (brandMobileSelect) {
+      const current = selectedBrandId;
+      brandMobileSelect.innerHTML = '<option value="">Todas as marcas</option>';
+      brands.forEach((brand) => {
+        const option = document.createElement("option");
+        option.value = `${brand.type}:${brand.id}`;
+        option.textContent = brand.name;
+        brandMobileSelect.append(option);
+      });
+      brandMobileSelect.value = brands.some((brand) => `${brand.type}:${brand.id}` === current) ? current : "";
     }
 
     if (!brandGrid) {
@@ -1094,6 +1107,21 @@ async function initCatalog() {
     applyFilters();
   });
 
+  brandMobileSelect?.addEventListener("change", () => {
+    selectedBrandId = brandMobileSelect.value;
+
+    if (selectedBrandId) {
+      const [brandType] = selectedBrandId.split(":");
+      vehicleType.value = brandType;
+      syncCustomSelect(vehicleType);
+      typeSwitch?.querySelectorAll("[data-type-filter]").forEach((typeButton) => {
+        typeButton.classList.toggle("is-active", typeButton.dataset.typeFilter === vehicleType.value);
+      });
+    }
+
+    applyFilters();
+  });
+
   clear.addEventListener("click", () => {
     search.value = "";
     vehicleType.value = "";
@@ -1101,6 +1129,9 @@ async function initCatalog() {
     transmission.value = "";
     sort.value = "featured";
     selectedBrandId = "";
+    if (brandMobileSelect) {
+      brandMobileSelect.value = "";
+    }
     [vehicleType, fuel, transmission, sort].forEach(syncCustomSelect);
     typeSwitch?.querySelectorAll("[data-type-filter]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.typeFilter === "");
