@@ -562,6 +562,188 @@ body.is-ready .page-loader {
   font-weight: 800;
 }
 
+.brand-showcase {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(227, 6, 19, 0.075), transparent 34%),
+    linear-gradient(180deg, #ffffff, #fbfbfc),
+    var(--paper);
+  box-shadow: 0 18px 42px rgba(17, 18, 22, 0.08);
+}
+
+.brand-showcase-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.brand-showcase-head div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.brand-showcase-head span {
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand-showcase-head strong {
+  font-size: 1.32rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.type-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f0f1f4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.type-switch button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--steel);
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.type-switch button.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 12px;
+  max-height: 318px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.brand-card {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, #ffffff, #fbfbfc);
+  color: var(--ink);
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(17, 18, 22, 0.045);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.brand-card:hover,
+.brand-card.is-active {
+  border-color: rgba(227, 6, 19, 0.38);
+  box-shadow: 0 14px 28px rgba(17, 18, 22, 0.1);
+  transform: translateY(-2px);
+}
+
+.brand-card.is-active {
+  background:
+    linear-gradient(135deg, rgba(227, 6, 19, 0.1), transparent 45%),
+    #ffffff;
+}
+
+.brand-logo-mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f5f6f8;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.brand-logo-mark img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.brand-logo-mark span {
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.brand-card-copy {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.brand-card-copy strong,
+.brand-card-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-card-copy strong {
+  font-size: 0.9rem;
+  line-height: 1.08;
+  text-transform: uppercase;
+  white-space: normal;
+}
+
+.brand-card-copy small {
+  color: var(--steel);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.vehicle-brand-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vehicle-brand-row span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.vehicle-brand-row span:last-child {
+  background: rgba(227, 6, 19, 0.1);
+  color: var(--red);
+}
+
 .vehicle-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 420px));
@@ -1201,6 +1383,149 @@ body.admin-login-mode .section-title h1 {
   grid-column: span 2;
 }
 
+.photo-manager {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(23, 24, 28, 0.08);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(227, 6, 19, 0.055), transparent 36%),
+    #fbfbfc;
+}
+
+.photo-manager-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.photo-manager-head div {
+  display: grid;
+  gap: 5px;
+}
+
+.photo-manager-head span {
+  color: var(--red);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.photo-manager-head strong {
+  font-size: 1.18rem;
+}
+
+.photo-manager-head small,
+.photo-drop small {
+  color: var(--steel);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.photo-drop {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  align-items: center;
+  gap: 14px;
+  min-height: 112px;
+  padding: 18px;
+  border: 1px dashed rgba(227, 6, 19, 0.38);
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.photo-drop:hover,
+.photo-drop:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 12px 28px rgba(227, 6, 19, 0.08);
+  transform: translateY(-1px);
+}
+
+.photo-drop input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.photo-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 8px;
+  background: var(--red);
+  color: var(--paper);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.photo-drop > span:last-child {
+  display: grid;
+  gap: 4px;
+}
+
+.photo-drop strong {
+  font-size: 1.08rem;
+  text-transform: uppercase;
+}
+
+.photo-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px;
+}
+
+.photo-preview-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 118px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.photo-preview-card img {
+  width: 100%;
+  aspect-ratio: 1.15 / 1;
+  object-fit: cover;
+  background: var(--soft);
+}
+
+.photo-preview-card span {
+  display: block;
+  padding: 8px;
+  color: var(--steel);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.photo-cover-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(23, 24, 28, 0.86);
+  color: var(--paper);
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.photo-url-field {
+  padding-top: 4px;
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1462,7 +1787,7 @@ body.toast-visible::after {
   body[data-page="catalog"] .catalog-toolbar {
     display: grid;
     grid-template-columns: 1fr;
-    margin-top: -58px;
+    margin-top: 0;
     margin-bottom: 16px;
     padding: 12px;
     border: 1px solid var(--line);
@@ -1473,6 +1798,28 @@ body.toast-visible::after {
 
   body[data-page="catalog"] .catalog-toolbar span {
     text-align: center;
+  }
+
+  body[data-page="catalog"] .brand-showcase {
+    margin-top: -58px;
+    margin-bottom: 16px;
+    padding: 14px;
+    box-shadow: 0 12px 34px rgba(17, 18, 22, 0.12);
+  }
+
+  .brand-showcase-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .type-switch {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .type-switch button {
+    padding-inline: 6px;
   }
 
   .heading-actions {
@@ -1579,6 +1926,27 @@ body.toast-visible::after {
   body[data-page="catalog"] .vehicle-title p {
     min-height: 0;
     font-size: 0.82rem;
+  }
+
+  .brand-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 292px;
+  }
+
+  .brand-card {
+    grid-template-columns: 40px 1fr;
+    min-height: 68px;
+    padding: 10px;
+  }
+
+  .brand-logo-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-logo-mark img {
+    width: 28px;
+    height: 28px;
   }
 
   body[data-page="catalog"] .spec-list {

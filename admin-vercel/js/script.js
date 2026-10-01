@@ -23,6 +23,96 @@ const DEMO_SETTINGS = {
   whatsapp: ""
 };
 const SUPABASE_CONNECTION_ERROR = "Supabase indisponivel. Reative o projeto ou confira URL e anon key.";
+const BRAND_ICON_BASE = "https://cdn.simpleicons.org";
+const VEHICLE_TYPES = {
+  car: "Carros",
+  motorcycle: "Motos"
+};
+const CAR_BRANDS = [
+  ["abarth", "Abarth", "abarth", ["abarth"]],
+  ["aston-martin", "Aston Martin", "astonmartin", ["aston martin"]],
+  ["audi", "Audi", "audi", ["audi"]],
+  ["bentley", "Bentley", "bentley", ["bentley"]],
+  ["bmw", "BMW", "bmw", ["bmw"]],
+  ["byd", "BYD", "byd", ["byd"]],
+  ["caoa-chery", "Caoa Chery", "chery", ["caoa chery", "chery"]],
+  ["chevrolet", "Chevrolet", "chevrolet", ["chevrolet", "gm"]],
+  ["citroen", "Citroen", "citroen", ["citroen"]],
+  ["ferrari", "Ferrari", "ferrari", ["ferrari"]],
+  ["fiat", "Fiat", "fiat", ["fiat"]],
+  ["ford", "Ford", "ford", ["ford"]],
+  ["gwm", "GWM", "greatwall", ["gwm", "great wall", "haval", "ora", "wey"]],
+  ["honda", "Honda", "honda", ["honda", "civic", "city", "fit", "hr-v", "hrv", "wr-v", "wrv", "cr-v", "crv", "accord"]],
+  ["hyundai", "Hyundai", "hyundai", ["hyundai", "hyunday"]],
+  ["iveco", "Iveco", "iveco", ["iveco"]],
+  ["jac", "JAC", "jac", ["jac"]],
+  ["jaguar", "Jaguar", "jaguar", ["jaguar"]],
+  ["jeep", "Jeep", "jeep", ["jeep"]],
+  ["kia", "Kia", "kia", ["kia"]],
+  ["lamborghini", "Lamborghini", "lamborghini", ["lamborghini"]],
+  ["land-rover", "Land Rover", "landrover", ["land rover", "range rover"]],
+  ["leapmotor", "Leapmotor", "", ["leapmotor", "leap"]],
+  ["lexus", "Lexus", "lexus", ["lexus"]],
+  ["maserati", "Maserati", "maserati", ["maserati"]],
+  ["mclaren", "McLaren", "mclaren", ["mclaren"]],
+  ["mercedes-benz", "Mercedes-Benz", "mercedesbenz", ["mercedes", "mercedes-benz"]],
+  ["mini", "Mini", "mini", ["mini"]],
+  ["mitsubishi", "Mitsubishi", "mitsubishi", ["mitsubishi"]],
+  ["neta", "Neta", "", ["neta"]],
+  ["nissan", "Nissan", "nissan", ["nissan"]],
+  ["omoda-jaecoo", "Omoda Jaecoo", "", ["omoda", "jaecoo", "omoda jaecoo"]],
+  ["peugeot", "Peugeot", "peugeot", ["peugeot"]],
+  ["porsche", "Porsche", "porsche", ["porsche"]],
+  ["ram", "Ram", "ram", ["ram"]],
+  ["renault", "Renault", "renault", ["renault"]],
+  ["riddara", "Riddara", "", ["riddara", "radar"]],
+  ["rolls-royce", "Rolls-Royce", "rollsroyce", ["rolls royce", "rolls-royce"]],
+  ["seres", "Seres", "", ["seres"]],
+  ["subaru", "Subaru", "subaru", ["subaru"]],
+  ["suzuki", "Suzuki", "suzuki", ["suzuki"]],
+  ["toyota", "Toyota", "toyota", ["toyota"]],
+  ["volkswagen", "Volkswagen", "volkswagen", ["volkswagen", "vw"]],
+  ["volvo", "Volvo", "volvo", ["volvo"]],
+  ["zeekr", "Zeekr", "zeekr", ["zeekr"]]
+];
+const MOTORCYCLE_BRANDS = [
+  ["avelloz", "Avelloz", "", ["avelloz"]],
+  ["bajaj", "Bajaj", "bajaj", ["bajaj"]],
+  ["bmw", "BMW", "bmw", ["bmw"]],
+  ["bull", "Bull", "", ["bull"]],
+  ["cfmoto", "CFMoto", "", ["cfmoto", "cf moto"]],
+  ["dafra", "Dafra", "", ["dafra"]],
+  ["ducati", "Ducati", "ducati", ["ducati"]],
+  ["gcx", "GCX", "", ["gcx"]],
+  ["haojue", "Haojue", "", ["haojue"]],
+  ["harley-davidson", "Harley-Davidson", "harleydavidson", ["harley", "harley-davidson"]],
+  ["honda", "Honda", "honda", ["honda", "biz", "bros", "cg", "cb", "cbr", "cbx", "crf", "fan", "pcx", "pop", "start", "titan", "twister"]],
+  ["kawasaki", "Kawasaki", "kawasaki", ["kawasaki", "ninja", "z300", "z400", "z650"]],
+  ["ktm", "KTM", "ktm", ["ktm"]],
+  ["kymco", "Kymco", "", ["kymco"]],
+  ["mobilli", "Mobilli", "", ["mobilli"]],
+  ["mottu", "Mottu", "", ["mottu"]],
+  ["mv-agusta", "MV Agusta", "", ["mv agusta", "mv-agusta"]],
+  ["piaggio-vespa", "Piaggio Vespa", "vespa", ["piaggio", "vespa"]],
+  ["royal-enfield", "Royal Enfield", "royalenfield", ["royal enfield", "royal-enfield", "himalayan", "hunter", "meteor"]],
+  ["shineray", "Shineray", "", ["shineray"]],
+  ["suzuki", "Suzuki", "suzuki", ["suzuki"]],
+  ["triumph", "Triumph", "triumph", ["triumph"]],
+  ["vmoto", "Vmoto", "", ["vmoto", "super soco", "supersoco"]],
+  ["voltz", "Voltz", "", ["voltz"]],
+  ["yamaha", "Yamaha", "yamahamotorcorporation", ["yamaha", "crosser", "factor", "fazer", "fz", "lander", "mt-", "nmax", "tenere", "xj6", "xmax", "xtz", "yzf"]],
+  ["zontes", "Zontes", "", ["zontes"]]
+];
+const MOTORCYCLE_HINTS = [
+  "biz", "bros", "cg", "cb", "cbr", "cbx", "citycom", "crf", "crosser", "dominar", "factor",
+  "fan", "fazer", "fz", "hayabusa", "himalayan", "hunter", "lander", "meteor", "mt-", "ninja",
+  "nmax", "pcx", "pop", "pulsar", "scooter", "srad", "start", "tenere", "tiger", "titan",
+  "twister", "xj6", "xmax", "xtz", "yzf", "z300", "z400", "z650"
+];
+const ALL_BRANDS = [
+  ...CAR_BRANDS.map(([id, name, icon, aliases]) => ({ id, name, icon, aliases, type: "car" })),
+  ...MOTORCYCLE_BRANDS.map(([id, name, icon, aliases]) => ({ id, name, icon, aliases, type: "motorcycle" }))
+];
 const DEMO_VEHICLES = [
   {
     id: "demo-corolla-cross",
@@ -99,6 +189,7 @@ let vehiclesCache = [];
 let settingsCache = { whatsapp: "" };
 let usingDemoData = false;
 const preloadedImageUrls = new Map();
+let adminPhotoPreviewUrls = [];
 const loaderStartedAt = Date.now();
 
 document.body.classList.add("is-loading");
@@ -198,6 +289,170 @@ function escapeHtml(value) {
 
 function labelFrom(map, value) {
   return map[value] || value || "-";
+}
+
+function logoUrlForBrand(brand) {
+  return brand?.icon ? `${BRAND_ICON_BASE}/${brand.icon}/17181c` : "";
+}
+
+function brandInitials(name) {
+  return String(name || "?")
+    .split(/[\s-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function vehicleSearchText(vehicle) {
+  return normalizeText([
+    vehicle.name,
+    vehicle.version,
+    vehicle.engine,
+    vehicle.description,
+    Array.isArray(vehicle.highlights) ? vehicle.highlights.join(" ") : ""
+  ].join(" "));
+}
+
+function findBrand(vehicle, type = "") {
+  const text = vehicleSearchText(vehicle);
+  const candidates = ALL_BRANDS.filter((brand) => !type || brand.type === type);
+
+  return candidates.find((brand) => (
+    brand.aliases.some((alias) => {
+      const normalizedAlias = normalizeText(alias);
+      return text === normalizedAlias
+        || text.startsWith(`${normalizedAlias} `)
+        || text.includes(` ${normalizedAlias} `)
+        || text.includes(` ${normalizedAlias}-`);
+    })
+  )) || null;
+}
+
+function hasBrandAlias(vehicle, brand, alias) {
+  const text = vehicleSearchText(vehicle);
+  const normalizedAlias = normalizeText(alias);
+
+  if (!brand?.aliases?.includes(alias) || !normalizedAlias) {
+    return false;
+  }
+
+  return text === normalizedAlias
+    || text.startsWith(`${normalizedAlias} `)
+    || text.includes(` ${normalizedAlias} `)
+    || text.includes(` ${normalizedAlias}-`);
+}
+
+function hasSpecificBrandAlias(vehicle, brand) {
+  return brand?.aliases?.some((alias) => normalizeText(alias) !== normalizeText(brand.name) && hasBrandAlias(vehicle, brand, alias));
+}
+
+function hasMotorcycleHint(vehicle) {
+  const text = vehicleSearchText(vehicle);
+  return MOTORCYCLE_HINTS.some((hint) => text.includes(normalizeText(hint)));
+}
+
+function inferVehicleType(vehicle) {
+  const motorcycleBrand = findBrand(vehicle, "motorcycle");
+  const carBrand = findBrand(vehicle, "car");
+  const doors = Number(vehicle.doors);
+  const seats = Number(vehicle.seats);
+
+  if (carBrand && hasSpecificBrandAlias(vehicle, carBrand) && !hasMotorcycleHint(vehicle)) {
+    return "car";
+  }
+
+  if (motorcycleBrand && (
+    (Number.isFinite(seats) && seats > 0 && seats <= 2)
+    || (Number.isFinite(doors) && doors > 0 && doors <= 1)
+    || hasMotorcycleHint(vehicle)
+  )) {
+    return "motorcycle";
+  }
+
+  if (motorcycleBrand && !carBrand) {
+    return "motorcycle";
+  }
+
+  return "car";
+}
+
+function vehicleBrand(vehicle) {
+  const type = inferVehicleType(vehicle);
+  return findBrand(vehicle, type) || findBrand(vehicle) || {
+    id: "outras",
+    name: "Outras",
+    icon: "",
+    aliases: [],
+    type
+  };
+}
+
+function vehicleTypeLabel(vehicle) {
+  return VEHICLE_TYPES[inferVehicleType(vehicle)] || "Veiculos";
+}
+
+function brandLogoMarkup(brand) {
+  const logoUrl = logoUrlForBrand(brand);
+
+  if (!logoUrl) {
+    return `<span>${escapeHtml(brandInitials(brand.name))}</span>`;
+  }
+
+  return `<img src="${escapeHtml(logoUrl)}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('${escapeHtml(brandInitials(brand.name))}'))">`;
+}
+
+function brandInventoryCounts(vehicles) {
+  return vehicles.reduce((counts, vehicle) => {
+    const type = inferVehicleType(vehicle);
+    const brand = vehicleBrand(vehicle);
+    const key = `${type}:${brand.id}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+    return counts;
+  }, new Map());
+}
+
+function availableBrandsFromVehicles(vehicles, type = "") {
+  const brands = new Map();
+
+  vehicles.forEach((vehicle) => {
+    const vehicleType = inferVehicleType(vehicle);
+
+    if (type && vehicleType !== type) {
+      return;
+    }
+
+    const brand = vehicleBrand(vehicle);
+    const key = `${vehicleType}:${brand.id}`;
+
+    if (!brands.has(key)) {
+      brands.set(key, { ...brand, type: vehicleType });
+    }
+  });
+
+  return [...brands.values()].sort((a, b) => {
+    const typeOrder = a.type.localeCompare(b.type);
+    return typeOrder || a.name.localeCompare(b.name);
+  });
+}
+
+function brandGridMarkup(brands, counts, selectedBrandId) {
+  return brands.map((brand) => {
+    const count = counts.get(`${brand.type}:${brand.id}`) || 0;
+    const isActive = selectedBrandId === `${brand.type}:${brand.id}`;
+    const countLabel = count === 1 ? "1 veiculo" : `${count} veiculos`;
+
+    return `
+      <button class="brand-card${isActive ? " is-active" : ""}" type="button" data-brand-id="${escapeHtml(brand.id)}" data-brand-type="${escapeHtml(brand.type)}" aria-pressed="${isActive ? "true" : "false"}">
+        <span class="brand-logo-mark">${brandLogoMarkup(brand)}</span>
+        <span class="brand-card-copy">
+          <strong>${escapeHtml(brand.name)}</strong>
+          <small>${countLabel}</small>
+        </span>
+      </button>
+    `;
+  }).join("");
 }
 
 function storedVehicleImages(vehicle) {
@@ -397,6 +652,7 @@ function detailRows(vehicle) {
 function vehicleCard(vehicle) {
   const photos = vehiclePhotos(vehicle);
   const hasGallery = photos.length > 1;
+  const brand = vehicleBrand(vehicle);
 
   return `
     <article class="vehicle-card" data-vehicle-id="${escapeHtml(vehicle.id)}">
@@ -410,6 +666,10 @@ function vehicleCard(vehicle) {
         ` : ""}
       </div>
       <div class="vehicle-body">
+        <div class="vehicle-brand-row">
+          <span>${escapeHtml(brand.name)}</span>
+          <span>${escapeHtml(vehicleTypeLabel(vehicle))}</span>
+        </div>
         <div class="vehicle-title">
           <h2>${escapeHtml(vehicle.name)}</h2>
           <p>${escapeHtml(vehicle.version)}</p>
@@ -672,11 +932,16 @@ async function initCatalog() {
   const summary = document.querySelector("#resultSummary");
   const total = document.querySelector("#catalogTotal");
   const search = document.querySelector("#searchInput");
+  const vehicleType = document.querySelector("#vehicleTypeFilter");
   const fuel = document.querySelector("#fuelFilter");
   const transmission = document.querySelector("#transmissionFilter");
   const sort = document.querySelector("#sortSelect");
   const clear = document.querySelector("#clearFilters");
   const dialog = document.querySelector("#detailsDialog");
+  const brandGrid = document.querySelector("#brandGrid");
+  const brandTitle = document.querySelector("#brandShowcaseTitle");
+  const typeSwitch = document.querySelector(".type-switch");
+  let selectedBrandId = "";
 
   try {
     await fetchSettings();
@@ -690,23 +955,75 @@ async function initCatalog() {
 
   fillSelect(fuel, uniqueOptions(vehiclesCache, "fuel", FUEL_LABELS));
   fillSelect(transmission, uniqueOptions(vehiclesCache, "transmission", TRANSMISSION_LABELS));
-  [fuel, transmission, sort].forEach(createCustomSelect);
+  [vehicleType, fuel, transmission, sort].forEach(createCustomSelect);
+
+  function setTypeFilter(type) {
+    vehicleType.value = type;
+    selectedBrandId = "";
+    syncCustomSelect(vehicleType);
+    typeSwitch?.querySelectorAll("[data-type-filter]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.typeFilter === type);
+    });
+    applyFilters();
+  }
+
+  function renderBrandGrid(vehicles) {
+    const type = vehicleType.value;
+    const counts = brandInventoryCounts(vehicles);
+    const brands = availableBrandsFromVehicles(vehicles, type);
+
+    if (selectedBrandId && !brands.some((brand) => selectedBrandId === `${brand.type}:${brand.id}`)) {
+      selectedBrandId = "";
+    }
+
+    if (brandTitle) {
+      brandTitle.textContent = type ? `Marcas de ${VEHICLE_TYPES[type].toLowerCase()}` : "Carros e motos";
+    }
+
+    if (!brandGrid) {
+      return;
+    }
+
+    if (!brands.length) {
+      brandGrid.innerHTML = "";
+      brandGrid.hidden = true;
+      return;
+    }
+
+    brandGrid.hidden = false;
+    brandGrid.innerHTML = brandGridMarkup(brands, counts, selectedBrandId);
+  }
 
   function applyFilters() {
     const query = normalizeText(search.value);
     let filtered = [...vehiclesCache];
+    const selectedType = vehicleType.value;
 
     if (query) {
       filtered = filtered.filter((vehicle) => normalizeText([
         vehicle.name,
         vehicle.version,
         vehicle.model_year,
+        vehicleBrand(vehicle).name,
+        vehicleTypeLabel(vehicle),
         labelFrom(FUEL_LABELS, vehicle.fuel),
         labelFrom(TRANSMISSION_LABELS, vehicle.transmission),
         vehicle.color,
         vehicle.engine,
         vehicle.drivetrain
       ].join(" ")).includes(query));
+    }
+
+    if (selectedType) {
+      filtered = filtered.filter((vehicle) => inferVehicleType(vehicle) === selectedType);
+    }
+
+    if (selectedBrandId) {
+      const [brandType, brandId] = selectedBrandId.split(":");
+      filtered = filtered.filter((vehicle) => {
+        const brand = vehicleBrand(vehicle);
+        return inferVehicleType(vehicle) === brandType && brand.id === brandId;
+      });
     }
 
     if (fuel.value) {
@@ -729,21 +1046,65 @@ async function initCatalog() {
       filtered.sort((a, b) => String(b.model_year).localeCompare(String(a.model_year)));
     }
 
-    total.textContent = `${vehiclesCache.length} ${vehiclesCache.length === 1 ? "carro" : "carros"}`;
+    renderBrandGrid(vehiclesCache);
+    total.textContent = `${vehiclesCache.length} ${vehiclesCache.length === 1 ? "veiculo" : "veiculos"}`;
     summary.textContent = `${filtered.length} ${filtered.length === 1 ? "resultado" : "resultados"} no estoque${usingDemoData ? " (demo)" : ""}`;
     grid.innerHTML = filtered.map(vehicleCard).join("");
     preloadCatalogPhotos(filtered);
     empty.hidden = filtered.length > 0;
   }
 
-  [search, fuel, transmission, sort].forEach((control) => control.addEventListener("input", applyFilters));
+  [search, vehicleType, fuel, transmission, sort].forEach((control) => control.addEventListener("input", () => {
+    if (control === vehicleType) {
+      selectedBrandId = "";
+      typeSwitch?.querySelectorAll("[data-type-filter]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.typeFilter === vehicleType.value);
+      });
+    }
+
+    applyFilters();
+  }));
+
+  typeSwitch?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-type-filter]");
+
+    if (button) {
+      setTypeFilter(button.dataset.typeFilter);
+    }
+  });
+
+  brandGrid?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-brand-id]");
+
+    if (!button) {
+      return;
+    }
+
+    const nextBrandId = `${button.dataset.brandType}:${button.dataset.brandId}`;
+    selectedBrandId = selectedBrandId === nextBrandId ? "" : nextBrandId;
+
+    if (selectedBrandId) {
+      vehicleType.value = button.dataset.brandType;
+      syncCustomSelect(vehicleType);
+      typeSwitch?.querySelectorAll("[data-type-filter]").forEach((typeButton) => {
+        typeButton.classList.toggle("is-active", typeButton.dataset.typeFilter === vehicleType.value);
+      });
+    }
+
+    applyFilters();
+  });
 
   clear.addEventListener("click", () => {
     search.value = "";
+    vehicleType.value = "";
     fuel.value = "";
     transmission.value = "";
     sort.value = "featured";
-    [fuel, transmission, sort].forEach(syncCustomSelect);
+    selectedBrandId = "";
+    [vehicleType, fuel, transmission, sort].forEach(syncCustomSelect);
+    typeSwitch?.querySelectorAll("[data-type-filter]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.typeFilter === "");
+    });
     applyFilters();
   });
 
@@ -794,16 +1155,56 @@ function updatePhotoHelp(existingCount = 0, selectedCount = 0) {
     return;
   }
 
-  const total = existingCount + selectedCount;
-  help.textContent = total > 0
-    ? `${total} de ${MAX_VEHICLE_PHOTOS} fotos cadastradas ou selecionadas.`
+  if (selectedCount > 0) {
+    help.textContent = `${selectedCount} de ${MAX_VEHICLE_PHOTOS} fotos selecionadas. Ao salvar, elas substituem as atuais.`;
+    return;
+  }
+
+  help.textContent = existingCount > 0
+    ? `${existingCount} de ${MAX_VEHICLE_PHOTOS} fotos cadastradas. Ao escolher novas fotos, elas substituem as atuais.`
     : `Escolha ate ${MAX_VEHICLE_PHOTOS} imagens da galeria do celular.`;
+}
+
+function clearAdminPhotoPreviewUrls() {
+  adminPhotoPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+  adminPhotoPreviewUrls = [];
+}
+
+function renderAdminPhotoPreview({ existingPhotos = [], files = [] } = {}) {
+  const grid = document.querySelector("#photoPreviewGrid");
+
+  if (!grid) {
+    return;
+  }
+
+  clearAdminPhotoPreviewUrls();
+
+  const previews = files.length
+    ? files.map((file) => {
+      const url = URL.createObjectURL(file);
+      adminPhotoPreviewUrls.push(url);
+      return { url, label: file.name || "Foto selecionada" };
+    })
+    : existingPhotos.map((photo, index) => ({
+      url: photo.url,
+      label: photo.altText || `Foto ${index + 1}`
+    }));
+
+  grid.hidden = previews.length === 0;
+  grid.innerHTML = previews.map((preview, index) => `
+    <div class="photo-preview-card">
+      ${index === 0 ? '<strong class="photo-cover-badge">Capa</strong>' : ""}
+      <img src="${escapeHtml(preview.url)}" alt="${escapeHtml(preview.label)}">
+      <span>${index + 1} / ${previews.length}</span>
+    </div>
+  `).join("");
 }
 
 function resetForm(form) {
   form.reset();
   document.querySelector("#vehicleId").value = "";
   updatePhotoHelp();
+  renderAdminPhotoPreview();
   document.querySelector("#saveVehicleButton").textContent = "Salvar veículo";
 }
 
@@ -860,7 +1261,9 @@ function fillForm(vehicle) {
   document.querySelector("#carSortOrder").value = vehicle.sort_order || "";
   document.querySelector("#carDescription").value = vehicle.description || "";
   document.querySelector("#carPhotoFile").value = "";
-  updatePhotoHelp(storedVehicleImages(vehicle).length);
+  const existingPhotos = vehiclePhotos(vehicle).filter((photo) => photo.url !== DEFAULT_PHOTO);
+  updatePhotoHelp(existingPhotos.length);
+  renderAdminPhotoPreview({ existingPhotos });
   document.querySelector("#saveVehicleButton").textContent = "Atualizar veículo";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -942,6 +1345,17 @@ async function insertVehicleImages(client, vehicleId, urls, vehicleName, startOr
   }
 }
 
+async function deleteVehicleImages(client, vehicleId) {
+  const { error } = await client
+    .from("vehicle_images")
+    .delete()
+    .eq("vehicle_id", vehicleId);
+
+  if (error) {
+    throw error;
+  }
+}
+
 function setAdminEnabled(enabled) {
   document.body.classList.toggle("admin-login-mode", !enabled);
   document.body.classList.toggle("admin-active-mode", enabled);
@@ -982,6 +1396,7 @@ async function initAdmin() {
   const list = document.querySelector("#adminList");
   const empty = document.querySelector("#adminEmpty");
   const photoInput = document.querySelector("#carPhotoFile");
+  const photoUrlInput = document.querySelector("#carPhoto");
   const mileageInput = document.querySelector("#carMileage");
   const priceInput = document.querySelector("#carPrice");
 
@@ -1002,26 +1417,47 @@ async function initAdmin() {
 
   function existingPhotoCountForCurrentVehicle() {
     const vehicle = currentEditingVehicle();
-    return vehicle ? storedVehicleImages(vehicle).length : 0;
+    return vehicle ? vehiclePhotos(vehicle).filter((photo) => photo.url !== DEFAULT_PHOTO).length : 0;
+  }
+
+  function existingPhotosForCurrentVehicle() {
+    const vehicle = currentEditingVehicle();
+    return vehicle ? vehiclePhotos(vehicle).filter((photo) => photo.url !== DEFAULT_PHOTO) : [];
   }
 
   function selectedPhotoFiles() {
     return Array.from(photoInput?.files || []);
   }
 
+  function renderPhotoLinkPreview() {
+    if (selectedPhotoFiles().length) {
+      return;
+    }
+
+    const url = photoUrlInput?.value.trim();
+
+    if (url) {
+      renderAdminPhotoPreview({ existingPhotos: [{ url, altText: "Foto por link" }] });
+      return;
+    }
+
+    renderAdminPhotoPreview({ existingPhotos: existingPhotosForCurrentVehicle() });
+  }
+
   function validateSelectedPhotoLimit() {
     const existingCount = existingPhotoCountForCurrentVehicle();
     const files = selectedPhotoFiles();
-    const total = existingCount + files.length;
 
-    if (total > MAX_VEHICLE_PHOTOS) {
+    if (files.length > MAX_VEHICLE_PHOTOS) {
       photoInput.value = "";
       updatePhotoHelp(existingCount);
+      renderAdminPhotoPreview({ existingPhotos: existingPhotosForCurrentVehicle() });
       showToast(`Cada veiculo pode ter no maximo ${MAX_VEHICLE_PHOTOS} fotos`);
       return false;
     }
 
     updatePhotoHelp(existingCount, files.length);
+    renderAdminPhotoPreview({ existingPhotos: existingPhotosForCurrentVehicle(), files });
     return true;
   }
 
@@ -1064,6 +1500,7 @@ async function initAdmin() {
   });
 
   photoInput?.addEventListener("change", validateSelectedPhotoLimit);
+  photoUrlInput?.addEventListener("input", renderPhotoLinkPreview);
   mileageInput?.addEventListener("input", () => {
     mileageInput.value = formatIntegerInput(mileageInput.value);
   });
@@ -1076,7 +1513,6 @@ async function initAdmin() {
 
     const currentId = document.querySelector("#vehicleId").value;
     const files = selectedPhotoFiles();
-    const existingImageCount = existingPhotoCountForCurrentVehicle();
     formatAdminCommercialFields();
     const vehicle = vehicleFromForm();
 
@@ -1108,7 +1544,14 @@ async function initAdmin() {
         throw new Error("Nao foi possivel identificar o veiculo salvo.");
       }
 
-      await insertVehicleImages(client, savedVehicleId, uploadedUrls, vehicle.name, existingImageCount);
+      if (uploadedUrls.length) {
+        if (currentId) {
+          await deleteVehicleImages(client, savedVehicleId);
+        }
+
+        await insertVehicleImages(client, savedVehicleId, uploadedUrls, vehicle.name);
+      }
+
       await renderList();
       resetForm(form);
       showToast(currentId ? "Veículo atualizado" : "Veículo publicado");

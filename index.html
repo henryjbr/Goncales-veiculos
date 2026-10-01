@@ -40,6 +40,15 @@
         </label>
 
         <label class="field">
+          <span>Tipo</span>
+          <select id="vehicleTypeFilter">
+            <option value="">Todos</option>
+            <option value="car">Carros</option>
+            <option value="motorcycle">Motos</option>
+          </select>
+        </label>
+
+        <label class="field">
           <span>Combust&iacute;vel</span>
           <select id="fuelFilter">
             <option value="">Todos</option>
@@ -70,6 +79,21 @@
         <p>Novidades selecionadas</p>
         <h1>Gon&ccedil;alez Ve&iacute;culos</h1>
       </div>
+
+      <section class="brand-showcase" aria-label="Marcas do cat&aacute;logo">
+        <div class="brand-showcase-head">
+          <div>
+            <span>Cat&aacute;logo por marca</span>
+            <strong id="brandShowcaseTitle">Carros e motos</strong>
+          </div>
+          <div class="type-switch" role="group" aria-label="Filtrar por tipo">
+            <button class="is-active" type="button" data-type-filter="">Todos</button>
+            <button type="button" data-type-filter="car">Carros</button>
+            <button type="button" data-type-filter="motorcycle">Motos</button>
+          </div>
+        </div>
+        <div id="brandGrid" class="brand-grid"></div>
+      </section>
 
       <div class="catalog-toolbar">
         <span id="resultSummary">Carregando estoque</span>

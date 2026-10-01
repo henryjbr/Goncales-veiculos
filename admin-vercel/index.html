@@ -128,16 +128,31 @@
             <input id="carColor" required type="text" placeholder="Branco">
           </label>
 
-          <label class="field">
-            <span>Foto por link</span>
-            <input id="carPhoto" type="url" placeholder="https://...">
-          </label>
+          <div class="photo-manager span-2">
+            <div class="photo-manager-head">
+              <div>
+                <span>Fotos do ve&iacute;culo</span>
+                <strong>Escolha at&eacute; 10 imagens</strong>
+              </div>
+              <small id="carPhotoHelp">Toque no quadro para escolher fotos da galeria.</small>
+            </div>
 
-          <label class="field span-2">
-            <span>Enviar fotos</span>
-            <input id="carPhotoFile" type="file" accept="image/*,.heic,.heif" multiple>
-            <small id="carPhotoHelp">Escolha at&eacute; 10 imagens da galeria do celular.</small>
-          </label>
+            <label class="photo-drop" for="carPhotoFile">
+              <input id="carPhotoFile" type="file" accept="image/*,.heic,.heif" multiple>
+              <span class="photo-drop-icon">+</span>
+              <span>
+                <strong>Adicionar fotos</strong>
+                <small>A primeira imagem vira a capa do an&uacute;ncio.</small>
+              </span>
+            </label>
+
+            <div id="photoPreviewGrid" class="photo-preview-grid" hidden></div>
+
+            <label class="field photo-url-field">
+              <span>Ou usar foto por link</span>
+              <input id="carPhoto" type="url" placeholder="https://...">
+            </label>
+          </div>
 
           <label class="field span-2">
             <span>Destaques</span>
